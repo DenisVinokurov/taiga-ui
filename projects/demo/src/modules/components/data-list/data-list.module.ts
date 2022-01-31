@@ -1,20 +1,28 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {generateRoutes, TuiAddonDocModule} from '@taiga-ui/addon-doc';
 import {TuiActiveZoneModule, TuiFilterPipeModule, TuiLetModule} from '@taiga-ui/cdk';
 import {
     TuiButtonModule,
+    TuiCalendarModule,
     TuiDataListModule,
-    TuiDropdownModule,
+    TuiDropdownModule, TuiGroupModule,
     TuiHostedDropdownModule,
     TuiNotificationModule,
     TuiPrimitiveTextfieldModule,
     TuiSvgModule,
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
-import {TuiArrowModule, TuiMultiSelectModule, TuiSelectModule} from '@taiga-ui/kit';
+import {
+    TuiArrowModule,
+    TuiDropdownHoverModule,
+    TuiInputDateRangeModule,
+    TuiInputModule,
+    TuiMultiSelectModule,
+    TuiSelectModule,
+} from '@taiga-ui/kit';
 
 import {ExampleTuiDataListComponent} from './data-list.component';
 import {TuiDataListExample1} from './examples/1';
@@ -22,11 +30,14 @@ import {TuiDataListExample2} from './examples/2';
 import {TuiDataListExample3} from './examples/3';
 import {TuiDataListExample4} from './examples/4';
 import {CustomListComponent} from './examples/4/custom-list/custom-list.component';
+import {TuiDataListExample5} from './examples/5';
+import {TuiMoneyModule} from "@taiga-ui/addon-commerce";
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
+        ReactiveFormsModule,
         TuiLetModule,
         TuiMultiSelectModule,
         TuiPrimitiveTextfieldModule,
@@ -43,6 +54,12 @@ import {CustomListComponent} from './examples/4/custom-list/custom-list.componen
         TuiAddonDocModule,
         RouterModule.forChild(generateRoutes(ExampleTuiDataListComponent)),
         TuiFilterPipeModule,
+        TuiCalendarModule,
+        TuiInputModule,
+        TuiInputDateRangeModule,
+        TuiDropdownHoverModule,
+        TuiMoneyModule,
+        TuiGroupModule
     ],
     declarations: [
         ExampleTuiDataListComponent,
@@ -51,6 +68,7 @@ import {CustomListComponent} from './examples/4/custom-list/custom-list.componen
         TuiDataListExample2,
         TuiDataListExample3,
         TuiDataListExample4,
+        TuiDataListExample5,
     ],
     exports: [ExampleTuiDataListComponent],
 })
