@@ -4,9 +4,9 @@ import {padStart} from '@taiga-ui/cdk';
 import {getCurrencySymbol} from './get-currency-symbol';
 
 export function formatCurrency(currency: TuiCurrencyVariants): string {
-    const stringifiedCurrency = stringifyCurrency(currency);
+    const stringifiesCurrency = stringifyCurrency(currency);
 
-    return getCurrencySymbol(stringifiedCurrency) || stringifiedCurrency;
+    return getCurrencySymbol(stringifiesCurrency) || stringifiesCurrency;
 }
 
 function stringifyCurrency(currency: TuiCurrencyVariants): string {
