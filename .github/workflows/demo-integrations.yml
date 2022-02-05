@@ -20,6 +20,7 @@ on:
 env:
   NX_BRANCH: ${{ github.event.number }}
   CYPRESS_API_URL: http://localhost:1234/
+  SNAPSHOTS_PATH: ./projects/demo-integrations/cypress/snapshots
 
   # disable shared memory X11 affecting Cypress v4 and Chrome
   # https://github.com/cypress-io/cypress-docker-images/issues/270
@@ -77,17 +78,30 @@ jobs:
                              "npm run cy2:run:localhost"
 
       - name: Run screenshot tests on demo/next
+        continue-on-error: true
         run: |
           npm run concurrently -- \
                          "npm run cy2:run:demo:next" \
                          "npm run cy2:run:demo:next"
+
+      - name: Check exist diff changes
+        id: diff-checker
+        run:
+          echo "::set-output name=diff::$(find ${{ env.SNAPSHOTS_PATH }} -type d -name '__diff_output__' | wc -l | sed
+          -e 's/^[[:space:]]*//')"
+
+      - run: echo ${{ steps.diff-checker.outputs.diff }}
+
+      - name: Check on failures
+        if: ${{ steps.diff-checker.outputs.diff != '0' }}
+        run: exit 1
 
       - name: Upload artifact
         uses: actions/upload-artifact@v1
         if: failure()
         with:
           name: cypress-screenshots
-          path: projects/demo-integrations/cypress/snapshots
+          path: ${{ env.SNAPSHOTS_PATH }}
           retention-days: 7
 
 concurrency:

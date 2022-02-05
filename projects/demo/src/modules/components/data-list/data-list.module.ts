@@ -2,13 +2,15 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
+import {TuiMoneyModule} from '@taiga-ui/addon-commerce';
 import {generateRoutes, TuiAddonDocModule} from '@taiga-ui/addon-doc';
 import {TuiActiveZoneModule, TuiFilterPipeModule, TuiLetModule} from '@taiga-ui/cdk';
 import {
     TuiButtonModule,
     TuiCalendarModule,
     TuiDataListModule,
-    TuiDropdownModule, TuiGroupModule,
+    TuiDropdownModule,
+    TuiGroupModule,
     TuiHostedDropdownModule,
     TuiNotificationModule,
     TuiPrimitiveTextfieldModule,
@@ -31,7 +33,6 @@ import {TuiDataListExample3} from './examples/3';
 import {TuiDataListExample4} from './examples/4';
 import {CustomListComponent} from './examples/4/custom-list/custom-list.component';
 import {TuiDataListExample5} from './examples/5';
-import {TuiMoneyModule} from "@taiga-ui/addon-commerce";
 
 @NgModule({
     imports: [
@@ -59,7 +60,7 @@ import {TuiMoneyModule} from "@taiga-ui/addon-commerce";
         TuiInputDateRangeModule,
         TuiDropdownHoverModule,
         TuiMoneyModule,
-        TuiGroupModule
+        TuiGroupModule,
     ],
     declarations: [
         ExampleTuiDataListComponent,

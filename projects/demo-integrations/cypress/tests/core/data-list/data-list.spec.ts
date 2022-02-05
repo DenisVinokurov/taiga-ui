@@ -1,3 +1,5 @@
+import {DEFAULT_TIMEOUT_BEFORE_ACTION} from '../../../support/shared.entities';
+
 describe('DataList', () => {
     beforeEach(() => {
         cy.viewport(1500, 800);
@@ -25,6 +27,7 @@ describe('DataList', () => {
         cy.matchImageSnapshot('3-converted-money', {capture: 'viewport'});
 
         cy.getByAutomationId('tui-data-list-email-option')
+            .wait(DEFAULT_TIMEOUT_BEFORE_ACTION)
             .click()
             .getByAutomationId('tui-data-list-email-field')
             .findByAutomationId('tui-primitive-textfield__native-input')
@@ -37,6 +40,7 @@ describe('DataList', () => {
         cy.matchImageSnapshot('4-email-opened', {capture: 'viewport'});
 
         cy.getByAutomationId('tui-data-list-range-option')
+            .wait(DEFAULT_TIMEOUT_BEFORE_ACTION)
             .click()
             .getByAutomationId('tui-data-list-range-field')
             .findByAutomationId('tui-primitive-textfield__native-input')
@@ -48,6 +52,7 @@ describe('DataList', () => {
         cy.matchImageSnapshot('5-range-opened', {capture: 'viewport'});
 
         cy.getByAutomationId('tui-data-list-calendar-option')
+            .wait(DEFAULT_TIMEOUT_BEFORE_ACTION)
             .click()
             .getByAutomationId('tui-primitive-calendar__cell')
             .eq(4)
@@ -55,7 +60,7 @@ describe('DataList', () => {
 
         cy.matchImageSnapshot('6-calendar-opened', {capture: 'viewport'});
 
-        cy.get(demo).click();
+        cy.get(demo).wait(DEFAULT_TIMEOUT_BEFORE_ACTION).click();
 
         cy.matchImageSnapshot('7-finish', {capture: 'viewport'});
     });
