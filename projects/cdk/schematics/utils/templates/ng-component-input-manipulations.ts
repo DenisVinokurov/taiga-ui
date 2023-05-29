@@ -1,8 +1,7 @@
 import {DevkitFileSystem} from 'ng-morph/project/classes/devkit-file-system';
 import {Element} from 'parse5';
 
-import {ALWAYS_TRUE_HANDLER} from '../../../constants';
-import {TemplateResource} from '../../ng-update/interfaces/template-resourse';
+import {TemplateResource} from '../../ng-update/interfaces/template-resource';
 import {addImportToClosestModule} from '../add-import-to-closest-module';
 import {
     findAttributeOnElementWithAttrs,
@@ -113,7 +112,8 @@ export function getInputPropertyOffsets(
     html: string,
     attrName: string,
     tags: string[],
-    filterFn: (element: Element) => boolean = ALWAYS_TRUE_HANDLER,
+    // eslint-disable-next-line no-restricted-syntax
+    filterFn: (element: Element) => boolean = () => true,
 ): Array<[number, number]> {
     return findElementsWithAttribute(html, attrName)
         .filter(

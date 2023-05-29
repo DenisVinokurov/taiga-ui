@@ -11,10 +11,10 @@ export function tuiVisitEditorApiPage({
     enableNightMode: boolean;
     skipDecodingUrl: boolean;
 }> = {}): void {
-    cy.viewport(1650, 900).tuiVisit(
-        `editor/getting-started/API?ngModel=${
-            content ?? HTML_EDITOR_BASIC_EXAMPLE
-        }&style.maxHeight.px=${maxHeight ?? 300}`,
+    cy.viewport(1850, 1600).tuiVisit(
+        `editor/API?ngModel=${content ?? HTML_EDITOR_BASIC_EXAMPLE}&style.maxHeight.px=${
+            maxHeight ?? 600
+        }`,
         {
             skipExpectUrl: true,
             enableNightMode: enableNightMode ?? false,
@@ -38,41 +38,46 @@ export function tuiGetNgModelValue(): Cypress.Chainable<JQuery> {
 }
 
 export function tuiOpenAnchorDropdown({containHref}: {containHref: string}): void {
-    tuiGetContentEditable().find(`a[href="${containHref}"]`).type(`{leftArrow}`);
+    tuiGetContentEditable().find(`a[href="${containHref}"]`).type(`{rightArrow}`);
 }
 
 export function tuiTrashValueByEditLink(): void {
-    cy.get(`button[icon=tuiIconUnlinkLarge]`)
-        .click({force: true})
-        .tuiWaitBeforeScreenshot();
+    cy.get(`tui-edit-link button[icon=tuiIconUnlinkLarge]`)
+        .tuiWaitBeforeScreenshot()
+        .realHover()
+        .realClick();
 }
 
 export function tuiFocusToStartInEditor(): void {
+    cy.get(`.ProseMirror[contenteditable]`).type(`{moveToStart}`);
+
     tuiGetContentEditable()
+        .focus()
         .then($el => {
             // native set cursor cater
 
-            const el = $el[0];
-            const document = el.ownerDocument;
-            const range = document?.createRange();
-            const sel = window.getSelection();
+            const el = $el.get(0);
+            const range = window.document.createRange();
 
-            range.setStart(el, 1);
-            range.collapse(true);
-            sel?.removeAllRanges();
-            sel?.addRange(range);
+            range?.setStart(el, 0);
+            range?.setEnd(el, 0);
+
+            const selection = window.getSelection();
+
+            selection?.removeAllRanges();
+            selection?.addRange(range);
         })
         .tuiWaitBeforeScreenshot();
 }
 
 export function tuiClearHint(): void {
-    cy.get(`tui-toolbar`).click();
+    cy.get(`body`).click({force: true});
 }
 
 export function tuiInsertLink(): void {
     tuiGetDemoContent()
         .find(`tui-toolbar button[icon=tuiIconLinkLarge]`)
-        .click()
+        .click({force: true})
         .tuiWaitBeforeScreenshot();
 
     cy.get(`body`).then($body => {
@@ -95,7 +100,7 @@ export function tuiOpenFontTool(): Cypress.Chainable<JQuery> {
 
     cy.get(`body`).then($body => {
         if ($body.find(`tui-data-list[role="listbox"]`).length === 0) {
-            cy.get(`@iconFontLargeTool`).click();
+            cy.get(`@iconFontLargeTool`).click({force: true});
         }
     });
 

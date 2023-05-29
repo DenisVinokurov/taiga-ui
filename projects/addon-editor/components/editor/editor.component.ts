@@ -23,10 +23,15 @@ import {
 } from '@taiga-ui/addon-editor/directives';
 import {TuiEditorTool} from '@taiga-ui/addon-editor/enums';
 import {TuiEditorAttachedFile} from '@taiga-ui/addon-editor/interfaces';
-import {TIPTAP_EDITOR, TUI_EDITOR_CONTENT_PROCESSOR} from '@taiga-ui/addon-editor/tokens';
+import {
+    TIPTAP_EDITOR,
+    TUI_EDITOR_CONTENT_PROCESSOR,
+    TUI_EDITOR_VALUE_TRANSFORMER,
+} from '@taiga-ui/addon-editor/tokens';
 import {tuiIsSafeLinkRange} from '@taiga-ui/addon-editor/utils';
 import {
     AbstractTuiControl,
+    AbstractTuiValueTransformer,
     ALWAYS_FALSE_HANDLER,
     tuiAsFocusableItemAccessor,
     TuiBooleanHandler,
@@ -42,7 +47,7 @@ import {TUI_EDITOR_PROVIDERS} from './editor.providers';
 @Component({
     selector: 'tui-editor',
     templateUrl: './editor.component.html',
-    styleUrls: ['./editor.style.less'],
+    styleUrls: ['./editor.component.less'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [tuiAsFocusableItemAccessor(TuiEditorComponent), TUI_EDITOR_PROVIDERS],
 })
@@ -51,7 +56,7 @@ export class TuiEditorComponent
     implements OnDestroy, TuiFocusableElementAccessor
 {
     @ViewChild(TuiTiptapEditorDirective, {read: ElementRef})
-    private readonly element?: ElementRef<HTMLElement>;
+    private readonly el?: ElementRef<HTMLElement>;
 
     @Input()
     @tuiDefaultProp()
@@ -62,7 +67,7 @@ export class TuiEditorComponent
     tools: readonly TuiEditorTool[] = defaultEditorTools;
 
     @Output()
-    fileAttached = new EventEmitter<TuiEditorAttachedFile[]>();
+    readonly fileAttached = new EventEmitter<Array<TuiEditorAttachedFile<any>>>();
 
     @ViewChild(TuiToolbarComponent)
     readonly toolbar?: TuiToolbarComponent;
@@ -74,19 +79,25 @@ export class TuiEditorComponent
         @Self()
         @Inject(NgControl)
         control: NgControl | null,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
         @Inject(TIPTAP_EDITOR) readonly editorLoaded$: Observable<Editor | null>,
         @Inject(TuiTiptapEditorService) readonly editorService: AbstractTuiEditor,
         @Inject(TUI_EDITOR_CONTENT_PROCESSOR)
         private readonly contentProcessor: TuiStringHandler<string>,
         @Inject(DOCUMENT)
-        private readonly documentRef: Document,
+        private readonly doc: Document,
+        @Optional()
+        @Inject(TUI_EDITOR_VALUE_TRANSFORMER)
+        transformer: AbstractTuiValueTransformer<string> | null,
     ) {
-        super(control, changeDetectorRef);
+        super(control, cdr, transformer);
     }
 
-    get nativeFocusableElement(): HTMLElement | null {
-        return this.computedDisabled ? null : this.element?.nativeElement || null;
+    get nativeFocusableElement(): HTMLDivElement | null {
+        return this.computedDisabled
+            ? null
+            : this.el?.nativeElement?.querySelector('[contenteditable].ProseMirror') ||
+                  null;
     }
 
     get dropdownSelectionHandler(): TuiBooleanHandler<Range> {
@@ -108,22 +119,32 @@ export class TuiEditorComponent
     }
 
     override writeValue(value: string | null): void {
+        if (value === this.value) {
+            return;
+        }
+
         const processed = this.contentProcessor(value || '');
 
         super.writeValue(processed);
 
         if (processed !== value) {
-            this.control?.setValue(processed);
+            this.control?.setValue(processed, {
+                onlySelf: false,
+                emitEvent: false,
+                emitModelToViewChange: false,
+                emitViewToModelChange: false,
+            });
         }
     }
 
     onActiveZone(focused: boolean): void {
         this.focused = focused;
         this.updateFocused(focused);
+        this.control?.updateValueAndValidity();
     }
 
     onModelChange(value: string): void {
-        this.updateValue(value);
+        this.value = value;
     }
 
     addAnchor(anchor: string): void {
@@ -141,6 +162,15 @@ export class TuiEditorComponent
 
     removeLink(): void {
         this.editor?.unsetLink();
+    }
+
+    focus(event: MouseEvent): void {
+        if (this.nativeFocusableElement?.contains(event.target as Node | null)) {
+            return;
+        }
+
+        event.preventDefault();
+        this.nativeFocusableElement?.focus();
     }
 
     override ngOnDestroy(): void {
@@ -163,7 +193,7 @@ export class TuiEditorComponent
     private currentFocusedNodeIsAnchor(range: Range): boolean {
         return !!range.startContainer.parentElement
             ?.closest('a')
-            ?.contains(this.documentRef.getSelection()?.focusNode || null);
+            ?.contains(this.doc.getSelection()?.focusNode || null);
     }
 
     private get hasValue(): boolean {

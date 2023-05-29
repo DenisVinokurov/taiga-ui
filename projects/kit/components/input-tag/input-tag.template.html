@@ -19,10 +19,12 @@
         <div class="t-content">
             <div
                 *ngIf="iconLeft"
-                class="t-icons t-icons_left"
+                class="t-icons t-icons_left t-textfield-icon"
             >
                 <tui-svg
                     *polymorpheusOutlet="iconLeft as src; context: {$implicit: size}"
+                    tuiWrapper
+                    appearance="icon"
                     class="t-icon"
                     [src]="src"
                 ></tui-svg>
@@ -59,7 +61,7 @@
                                 [disabled]="computedDisabled || disabledItemHandler(item)"
                                 [editable]="editable && !readOnly"
                                 [hoverable]="!readOnly"
-                                [removable]="!readOnly"
+                                [removable]="!readOnly && removable"
                                 [separator]="separator"
                                 [maxLength]="maxLength"
                                 [size]="controller.size"
@@ -73,6 +75,7 @@
                             <span
                                 *ngFor="let item of value"
                                 class="t-text"
+                                [class.t-text_comma]="computedFocused && !inputHidden"
                                 [class.t-text_disabled]="disabledItemHandler(item)"
                                 [class.t-text_error]="!tagValidator(item)"
                                 [textContent]="item"
@@ -107,6 +110,7 @@
                     </div>
                 </tui-scrollbar>
             </div>
+            <ng-content select="select"></ng-content>
             <div
                 *ngIf="hasRightIcons"
                 class="t-icons t-icons_right"
@@ -115,6 +119,8 @@
                     <tui-svg
                         *polymorpheusOutlet="iconCleaner as src; context: {$implicit: size}"
                         #cleaner
+                        tuiWrapper
+                        appearance="icon"
                         automation-id="tui-input-tag__cleaner"
                         class="t-cleaner"
                         [src]="src"
@@ -122,20 +128,20 @@
                     ></tui-svg>
                 </ng-container>
                 <tui-tooltip
-                    *ngIf="hintOptions && hintOptions.content && !computedDisabled"
+                    *ngIf="showHint"
                     automation-id="tui-input-tag__tooltip"
-                    describeId="placeholer_until_accesibility_is_added"
                     class="t-tooltip"
-                    [direction]="hintOptions.direction"
-                    [appearance]="hintOptions.appearance"
-                    [content]="hintOptions.content"
-                    [showDelay]="hintOptions.showDelay"
-                    [hideDelay]="hintOptions.hideDelay"
+                    [describeId]="id"
+                    [content]="hintOptions?.content"
                 ></tui-tooltip>
-                <div *ngIf="icon">
+                <div
+                    *ngIf="icon"
+                    class="t-icon t-textfield-icon"
+                >
                     <tui-svg
                         *polymorpheusOutlet="icon as src; context: {$implicit: size}"
-                        class="t-icon"
+                        tuiWrapper
+                        appearance="icon"
                         [src]="src"
                     ></tui-svg>
                 </div>
@@ -143,7 +149,7 @@
         </div>
         <ng-template #errorIcon>
             <tui-svg
-                src="tuiIconAttention"
+                src="tuiIconAlertCircle"
                 class="t-error-icon"
             ></tui-svg>
         </ng-template>

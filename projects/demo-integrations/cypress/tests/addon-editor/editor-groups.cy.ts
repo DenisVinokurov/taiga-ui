@@ -1,11 +1,12 @@
 import {tuiGetTipTapContentSelector} from '@demo-integrations/support/editor/helpers';
 
 describe(`Examples with groups in editor`, () => {
+    beforeEach(() => cy.tuiVisit(`editor/groups`));
+
     it(`Simple nested group`, () => {
-        cy.tuiVisit(`editor/groups`);
         makeWrapper(`#nested-groups`);
 
-        cy.get(`@wrapper`).should(`be.visible`).click(); // clear hints
+        cy.get(`@wrapper`).should(`be.visible`).tuiWaitBeforeAction().click(); // clear hints
 
         cy.get(`@editor`)
             .tuiWaitBeforeScreenshot()
@@ -13,7 +14,6 @@ describe(`Examples with groups in editor`, () => {
     });
 
     it(`Draggable groups`, () => {
-        cy.tuiVisit(`editor/groups`);
         makeWrapper(`#draggable-groups`);
 
         cy.get(`@editor`)
@@ -34,7 +34,7 @@ describe(`Examples with groups in editor`, () => {
         cy.get(`@wrapper`).find(`button[icon=tuiIconPlusLarge]`).click();
         cy.document().then(doc => cy.wrap(doc.activeElement, {log: false}).type(`456`));
 
-        cy.get(`@wrapper`).should(`be.visible`).click(); // clear hints
+        cy.get(`@wrapper`).should(`be.visible`).tuiWaitBeforeAction().click(); // clear hints
 
         cy.get(`@editor`)
             .tuiWaitBeforeScreenshot()
@@ -45,7 +45,9 @@ describe(`Examples with groups in editor`, () => {
         cy.get(exampleId)
             .findByAutomationId(`tui-doc-example`)
             .tuiScrollIntoView()
+            .tuiWaitBeforeScreenshot()
             .as(`wrapper`);
+
         cy.get(`@wrapper`).find(tuiGetTipTapContentSelector()).as(`editor`);
     }
 });

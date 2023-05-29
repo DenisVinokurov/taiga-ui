@@ -3,6 +3,7 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    DoCheck,
     ElementRef,
     HostBinding,
     HostListener,
@@ -46,7 +47,7 @@ import {TUI_LINE_CLAMP_OPTIONS, TuiLineClampOptions} from './line-clamp-options'
         },
     ],
 })
-export class TuiLineClampComponent implements AfterViewInit {
+export class TuiLineClampComponent implements DoCheck, AfterViewInit {
     @ViewChild(TuiHintDirective, {read: ElementRef})
     private readonly outlet?: ElementRef<HTMLElement>;
 
@@ -71,8 +72,7 @@ export class TuiLineClampComponent implements AfterViewInit {
     lineHeight = 24;
 
     @Input()
-    @tuiDefaultProp()
-    content: PolymorpheusContent = '';
+    content: PolymorpheusContent;
 
     @Output()
     readonly overflownChange: Observable<boolean> = this.isOverflown$.pipe(
@@ -85,7 +85,7 @@ export class TuiLineClampComponent implements AfterViewInit {
         switchMap(([prev, next]) =>
             next >= prev
                 ? of(next)
-                : tuiTypedFromEvent(this.elementRef.nativeElement, 'transitionend').pipe(
+                : tuiTypedFromEvent(this.el.nativeElement, 'transitionend').pipe(
                       filter(tuiIsCurrentTarget),
                       map(() => next),
                   ),
@@ -93,7 +93,7 @@ export class TuiLineClampComponent implements AfterViewInit {
     );
 
     constructor(
-        @Inject(ElementRef) private readonly elementRef: ElementRef<HTMLElement>,
+        @Inject(ElementRef) private readonly el: ElementRef<HTMLElement>,
         @Inject(Renderer2) private readonly renderer: Renderer2,
         @Inject(ChangeDetectorRef) private readonly cd: ChangeDetectorRef,
         @Inject(NgZone) private readonly ngZone: NgZone,
@@ -108,7 +108,7 @@ export class TuiLineClampComponent implements AfterViewInit {
         }
 
         const {scrollHeight, scrollWidth} = this.outlet.nativeElement;
-        const {clientHeight, clientWidth} = this.elementRef.nativeElement;
+        const {clientHeight, clientWidth} = this.el.nativeElement;
 
         // 4px buffer for IE/Edge incorrectly rounding scrollHeight
         return scrollHeight - clientHeight > 4 || scrollWidth - clientWidth > 0;
@@ -136,7 +136,7 @@ export class TuiLineClampComponent implements AfterViewInit {
         timer(0)
             .pipe(tuiZonefree(this.ngZone))
             .subscribe(() => {
-                this.renderer.addClass(this.elementRef.nativeElement, '_initialized');
+                this.renderer.addClass(this.el.nativeElement, '_initialized');
                 this.cd.detectChanges();
             });
     }

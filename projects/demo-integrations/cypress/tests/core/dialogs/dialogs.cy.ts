@@ -47,9 +47,9 @@ describe(`Dialogs`, () => {
                 cy.tuiHide(`tui-doc-page`);
                 cy.tuiWaitKitDialog();
 
-                cy.get(`tui-dialog`).matchImageSnapshot(
-                    `${index}-4-dialogs-dialog-directive`,
-                );
+                cy.get(`tui-dialog`)
+                    .tuiWaitBeforeScreenshot()
+                    .matchImageSnapshot(`${index}-4-dialogs-dialog-directive`);
             });
 
             it(`show simple`, () => {
@@ -58,7 +58,9 @@ describe(`Dialogs`, () => {
                 cy.tuiHide(`tui-doc-page`);
                 cy.tuiWaitKitDialog();
 
-                cy.get(`tui-dialog`).matchImageSnapshot(`${index}-5-dialogs`);
+                cy.get(`tui-dialog`)
+                    .tuiWaitBeforeScreenshot()
+                    .matchImageSnapshot(`${index}-5-dialogs`);
             });
 
             it(`show simple with custom button`, () => {
@@ -67,8 +69,121 @@ describe(`Dialogs`, () => {
                 cy.tuiHide(`tui-doc-page`);
                 cy.tuiWaitKitDialog();
 
-                cy.get(`tui-dialog`).matchImageSnapshot(`${index}-6-dialogs`);
+                cy.get(`tui-dialog`)
+                    .tuiWaitBeforeScreenshot()
+                    .matchImageSnapshot(`${index}-6-dialogs`);
+            });
+
+            describe(`Dialog with confirmation works`, () => {
+                beforeEach(() => {
+                    cy.get(`tui-dialog-example-8 button`).first().click();
+
+                    cy.tuiHide(`tui-doc-page`);
+                    cy.tuiWaitKitDialog();
+
+                    cy.get(`tui-dialog`)
+                        .last()
+                        .tuiWaitBeforeScreenshot()
+                        .matchImageSnapshot(`${index}-7-dialogs`);
+
+                    cy.tuiShow(`tui-doc-page`);
+                });
+
+                it(`Pristine form does not show prompt`, () => {
+                    cy.get(`tui-dialog .t-close`).click();
+                    cy.get(`tui-dialog`).should(`not.exist`);
+                });
+
+                it(`Dirty form shows prompt`, () => {
+                    cy.get(`tui-dialog input`).type(`Test`);
+                    cy.get(`tui-dialog .t-close`).click();
+                    cy.tuiHide(`tui-doc-page`);
+                    cy.tuiWaitKitDialog();
+
+                    cy.get(`tui-dialog`)
+                        .last()
+                        .tuiWaitBeforeScreenshot()
+                        .matchImageSnapshot(`${index}-7-dialogs-prompt`);
+                });
+
+                it(`Form is reset to pristine`, () => {
+                    cy.get(`tui-dialog input`).type(`Test`);
+                    cy.get(`tui-dialog .t-close`).click();
+                    cy.tuiWaitKitDialog();
+                    cy.get(`tui-prompt .t-button`).last().click();
+
+                    cy.get(`tui-dialog`).should(`not.exist`);
+
+                    cy.get(`tui-dialog-example-8 button`).first().click();
+                    cy.tuiWaitKitDialog();
+                    cy.get(`tui-dialog .t-close`).click();
+
+                    cy.get(`tui-dialog`).should(`not.exist`);
+                });
             });
         });
     }
+
+    describe(`dismissible & closeable`, () => {
+        it(`dismissible = false, closeable = false`, () => {
+            cy.tuiVisit(`components/dialog/API?closeable=true&dismissible=false`);
+
+            cy.get(`tui-doc-page .t-content button`).first().click();
+            cy.tuiWaitBeforeAction()
+                .get(`tui-dialog`)
+                .should(`exist`)
+                .trigger(`click`, {x: 100, y: 100, force: true})
+                .tuiWaitBeforeAction();
+            cy.get(`tui-dialog`).should(`be.visible`);
+        });
+
+        it(`dismissible = true, closeable = false`, () => {
+            cy.tuiVisit(`components/dialog/API?closeable=false&dismissible=true`);
+
+            cy.get(`tui-doc-page .t-content button`).first().click();
+            cy.get(`tui-dialog`)
+                .should(`exist`)
+                .trigger(`click`, {x: 10, y: 10, force: true})
+                .tuiWaitBeforeAction()
+                .should(`not.exist`);
+        });
+
+        it(`dismissible = false, closeable = true`, () => {
+            cy.tuiVisit(`components/dialog/API?closeable=true&dismissible=false`);
+
+            cy.get(`tui-doc-page .t-content button`).first().click();
+            cy.get(`tui-dialog`)
+                .should(`be.visible`)
+                .trigger(`click`, {x: 100, y: 100, force: true});
+
+            cy.getByAutomationId(`tui-dialog__close`).click();
+
+            cy.tuiWaitBeforeAction().get(`tui-dialog`).should(`not.exist`);
+        });
+
+        it(`dismissible = true, fullscreen`, () => {
+            cy.tuiVisit(`components/dialog/API?size=fullscreen&dismissible=true`);
+
+            cy.get(`tui-doc-page .t-content button`).first().click();
+            cy.tuiWaitBeforeAction()
+                .get(`tui-dialog`)
+                .should(`exist`)
+                .trigger(`click`, {x: 100, y: 600})
+                .tuiWaitBeforeAction();
+            cy.get(`tui-dialog`).should(`be.visible`);
+        });
+    });
+
+    describe(`confirmation`, () => {
+        it(`buttons wrap`, () => {
+            cy.tuiVisit(
+                `components/prompt/API?no=Very%20Long%20long%20text&yes=Long%20long%20text`,
+            );
+
+            cy.get(`tui-doc-page .t-content button`).first().click();
+            cy.get(`tui-dialog`)
+                .tuiWaitBeforeScreenshot()
+                .matchImageSnapshot(`1-confirmation`);
+        });
+    });
 });

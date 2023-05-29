@@ -15,11 +15,12 @@
     <section>
         <!-- TODO: Polymorpheus fix type -->
         <ng-container *polymorpheusOutlet="$any(context.content) as text; context: context">
-            {{ text }}
+            <div [innerHTML]="text"></div>
             <div class="t-buttons">
                 <button
-                    type="button"
                     tuiButton
+                    tuiAutoFocus
+                    type="button"
                     size="m"
                     (click)="context.$implicit.complete()"
                 >
@@ -29,6 +30,7 @@
         </ng-container>
     </section>
 </div>
+<div class="t-filler"></div>
 <div
     *ngIf="context.closeable"
     class="t-wrapper"
@@ -36,14 +38,14 @@
     <button
         type="button"
         tuiIconButton
-        tuiPreventDefault="mousedown"
         automation-id="tui-dialog__close"
         size="s"
-        appearance=""
         icon="tuiIconCloseLarge"
         shape="rounded"
         class="t-close"
+        [appearance]="fullscreen ? 'secondary' : ''"
         [title]="closeWord$ | async"
-        (click)="close()"
+        (click)="close$.next()"
+        (mousedown.prevent.silent)="(0)"
     ></button>
 </div>

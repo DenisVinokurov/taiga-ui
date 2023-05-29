@@ -26,13 +26,14 @@ export class HomeComponent {
     readonly main = import('./examples/main.md?raw');
     readonly addons = import('./examples/addons.md?raw');
     readonly nxAdd = import('./examples/nx-add.md?raw');
+    readonly nxMigrate = import('./examples/nx-migrate.md?raw');
 
     readonly customGlobalStyle = import(
         '../../../../../styles/taiga-ui-global.less?raw'
     ).then(({default: content}) => ({
         default: content
             // eslint-disable-next-line @typescript-eslint/quotes
-            .replaceAll("@import '", "@import '@taiga-ui/styles/")
+            .replace(/@import '/g, `@import '@taiga-ui/styles/`)
             .replace('@taiga-ui/styles/@taiga-ui/core', '@taiga-ui/core'),
     }));
 }

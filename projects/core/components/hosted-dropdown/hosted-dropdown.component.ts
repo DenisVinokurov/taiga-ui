@@ -10,6 +10,7 @@ import {
     Input,
     Optional,
     Output,
+    Self,
     ViewChild,
 } from '@angular/core';
 import {
@@ -26,20 +27,36 @@ import {
     tuiIsNativeKeyboardFocusable,
     TuiNativeFocusableElement,
 } from '@taiga-ui/cdk';
+import {TuiPositionAccessor} from '@taiga-ui/core/abstract';
 import {
     TuiDropdownDirective,
     TuiDropdownHoverDirective,
 } from '@taiga-ui/core/directives/dropdown';
 import {tuiIsEditingKey} from '@taiga-ui/core/utils/miscellaneous';
+import {shouldCall} from '@tinkoff/ng-event-plugins';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 import {BehaviorSubject, EMPTY, merge} from 'rxjs';
 import {distinctUntilChanged, skip} from 'rxjs/operators';
 
+import {TuiAccessorProxyDirective} from './accessor-proxy.directive';
 import {TuiHostedDropdownConnectorDirective} from './hosted-dropdown-connector.directive';
 
 export interface TuiHostedDropdownContext
     extends TuiContextWithImplicit<TuiActiveZoneDirective> {
     close(): void;
+}
+
+function shouldClose(
+    this: TuiHostedDropdownComponent,
+    event: Event | KeyboardEvent,
+): boolean {
+    return (
+        'key' in event &&
+        event.key.toLowerCase() === 'escape' &&
+        this.canOpen &&
+        this.open &&
+        !this.dropdown?.nextElementSibling
+    );
 }
 
 /* eslint-disable @typescript-eslint/member-ordering */
@@ -48,7 +65,14 @@ export interface TuiHostedDropdownContext
     templateUrl: './hosted-dropdown.template.html',
     styleUrls: ['./hosted-dropdown.style.less'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [tuiAsFocusableItemAccessor(TuiHostedDropdownComponent)],
+    providers: [
+        tuiAsFocusableItemAccessor(TuiHostedDropdownComponent),
+        {
+            provide: TuiAccessorProxyDirective,
+            deps: [[new Optional(), new Self(), TuiPositionAccessor]],
+            useFactory: (position: TuiPositionAccessor[] | null) => position?.[0],
+        },
+    ],
 })
 export class TuiHostedDropdownComponent implements TuiFocusableElementAccessor {
     @ContentChild(TuiHostedDropdownConnectorDirective, {read: ElementRef})
@@ -67,8 +91,7 @@ export class TuiHostedDropdownComponent implements TuiFocusableElementAccessor {
     readonly activeZone!: TuiActiveZoneDirective;
 
     @Input()
-    @tuiDefaultProp()
-    content: PolymorpheusContent<TuiHostedDropdownContext> = '';
+    content: PolymorpheusContent<TuiHostedDropdownContext>;
 
     @Input()
     @tuiDefaultProp()
@@ -93,7 +116,7 @@ export class TuiHostedDropdownComponent implements TuiFocusableElementAccessor {
         @Optional()
         @Inject(TuiDropdownHoverDirective)
         private readonly hover$: TuiDropdownHoverDirective | null,
-        @Inject(ElementRef) private readonly elementRef: ElementRef,
+        @Inject(ElementRef) private readonly el: ElementRef,
     ) {}
 
     @Input()
@@ -107,14 +130,14 @@ export class TuiHostedDropdownComponent implements TuiFocusableElementAccessor {
     }
 
     get host(): HTMLElement {
-        return this.dropdownHost?.nativeElement || this.elementRef.nativeElement;
+        return this.dropdownHost?.nativeElement || this.el.nativeElement;
     }
 
     get computedHost(): HTMLElement {
         return (
             this.dropdownHost?.nativeElement ||
             this.nativeFocusableElement ||
-            this.elementRef.nativeElement
+            this.el.nativeElement
         );
     }
 
@@ -127,7 +150,7 @@ export class TuiHostedDropdownComponent implements TuiFocusableElementAccessor {
             ? this.host
             : tuiGetClosestFocusable({
                   initial: this.host,
-                  root: this.elementRef.nativeElement,
+                  root: this.el.nativeElement,
               });
     }
 
@@ -159,12 +182,9 @@ export class TuiHostedDropdownComponent implements TuiFocusableElementAccessor {
         }
     }
 
-    @HostListener('keydown.esc', ['$event'])
+    @shouldCall(shouldClose)
+    @HostListener('document:keydown.silent', ['$event'])
     onKeyDownEsc(event: Event): void {
-        if (!this.canOpen || !this.open) {
-            return;
-        }
-
         event.stopPropagation();
         this.closeDropdown();
     }

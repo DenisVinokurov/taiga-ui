@@ -7,10 +7,10 @@ import {
     Self,
     TemplateRef,
 } from '@angular/core';
-import {TuiDestroyService} from '@taiga-ui/cdk';
+import {TuiDestroyService, tuiIfMap} from '@taiga-ui/cdk';
 import {PolymorpheusTemplate} from '@tinkoff/ng-polymorpheus';
-import {EMPTY, Observable, Subject} from 'rxjs';
-import {switchMap, takeUntil} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 // TODO: find the best way for prevent cycle
 // eslint-disable-next-line import/no-cycle
@@ -20,7 +20,7 @@ import {TuiPushService} from './push.service';
     selector: '[tuiPush]',
     providers: [TuiDestroyService],
 })
-export class TuiPushAlertDirective extends PolymorpheusTemplate<any> {
+export class TuiPushAlertDirective extends PolymorpheusTemplate {
     private readonly show$ = new Subject<boolean>();
 
     @Input()
@@ -30,15 +30,15 @@ export class TuiPushAlertDirective extends PolymorpheusTemplate<any> {
 
     constructor(
         @Inject(TemplateRef) template: TemplateRef<any>,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
         @Self() @Inject(TuiDestroyService) destroy$: Observable<unknown>,
         @Inject(forwardRef(() => TuiPushService)) push: TuiPushService,
     ) {
-        super(template, changeDetectorRef);
+        super(template, cdr);
 
         this.show$
             .pipe(
-                switchMap(show => (show ? push.open(this) : EMPTY)),
+                tuiIfMap(() => push.open(this)),
                 takeUntil(destroy$),
             )
             .subscribe();

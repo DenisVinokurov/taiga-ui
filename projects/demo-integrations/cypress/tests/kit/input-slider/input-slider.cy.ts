@@ -83,13 +83,26 @@ describe(`InputSlider`, () => {
                 .matchImageSnapshot(`4-value-content-not-overlapped`);
         });
     });
-});
 
-function initializeAliases(inputSliderSelector: string): void {
-    cy.get(`${inputSliderSelector} input[type="range"]`)
-        .should(`be.visible`)
-        .as(`slider`);
-    cy.get(`${inputSliderSelector} tui-input-number input`)
-        .should(`exist`)
-        .as(`textInput`);
-}
+    it(`disables both text field and slider when host component has disabled state`, () => {
+        cy.viewport(`iphone-x`);
+        cy.tuiVisit(`components/input-slider/API?min=-10&max=10`);
+        initializeAliases(`#demo-content tui-input-slider`);
+
+        cy.get(`tr`).contains(`Disabled state`).parents(`tr`).find(`tui-toggle`).click();
+
+        cy.get(`@textInput`).should(`be.disabled`);
+        cy.get(`@slider`).should(`be.disabled`);
+
+        cy.get(`#demo-content`).matchImageSnapshot(`5-disabled-state`);
+    });
+
+    function initializeAliases(inputSliderSelector: string): void {
+        cy.get(`${inputSliderSelector} input[type="range"]`)
+            .should(`be.visible`)
+            .as(`slider`);
+        cy.get(`${inputSliderSelector} tui-input-number input`)
+            .should(`exist`)
+            .as(`textInput`);
+    }
+});

@@ -1,10 +1,10 @@
 import {NgModule} from '@angular/core';
-import {RouterModule} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 
 import {GettingStartedComponent} from './getting-started/getting-started.component';
 import {LandingComponent} from './landing/landing.component';
 
-export const ROUTES = [
+export const ROUTES: Routes = [
     {
         path: ``,
         component: LandingComponent,
@@ -113,11 +113,29 @@ export const ROUTES = [
         },
     },
     {
-        path: `dialogs`,
+        path: `dialog/custom`,
         loadChildren: async () =>
             (await import(`../customization/dialogs/dialogs.module`)).DialogsModule,
         data: {
-            title: `Dialogs`,
+            title: `Custom`,
+        },
+    },
+    {
+        path: `dialog/routable`,
+        loadChildren: async () =>
+            (await import(`../customization/routable/eager/routable-dialog.module`))
+                .RoutableDialogModule,
+        data: {
+            title: `Routable`,
+        },
+    },
+    {
+        path: `dialog/lazy-routable`,
+        loadChildren: async () =>
+            (await import(`../customization/routable/lazy/lazy-routable-dialog.module`))
+                .LazyRoutableDialogModule,
+        data: {
+            title: `LazyRoutable`,
         },
     },
     {
@@ -177,6 +195,15 @@ export const ROUTES = [
                 .ExampleTuiBadgedContentModule,
         data: {
             title: `BadgedContent`,
+        },
+    },
+    {
+        path: `layout/block-status`,
+        loadChildren: async () =>
+            (await import(`../components/block-status/block-status.module`))
+                .ExampleTuiBlockStatusModule,
+        data: {
+            title: `BlockStatus`,
         },
     },
     {
@@ -283,6 +310,15 @@ export const ROUTES = [
                 .ExampleTuiDataListModule,
         data: {
             title: `DataList`,
+        },
+    },
+    {
+        path: `components/data-list-wrapper`,
+        loadChildren: async () =>
+            (await import(`../components/data-list-wrapper/data-list-wrapper.module`))
+                .ExampleTuiDataListWrapperModule,
+        data: {
+            title: `DataListWrapper`,
         },
     },
     {
@@ -840,6 +876,22 @@ export const ROUTES = [
         },
     },
     {
+        path: `navigation/app-bar`,
+        loadChildren: async () =>
+            (await import(`../components/app-bar/app-bar.module`)).ExampleTuiAppBarModule,
+        data: {
+            title: `AppBar`,
+        },
+    },
+    {
+        path: `navigation/tab-bar`,
+        loadChildren: async () =>
+            (await import(`../components/tab-bar/tab-bar.module`)).ExampleTuiTabBarModule,
+        data: {
+            title: `TabBar`,
+        },
+    },
+    {
         path: `navigation/tabs`,
         loadChildren: async () =>
             (await import(`../components/tabs/tabs.module`)).ExampleTuiTabsModule,
@@ -919,6 +971,14 @@ export const ROUTES = [
         },
     },
     {
+        path: `components/prompt`,
+        loadChildren: async () =>
+            (await import(`../components/prompt/prompt.module`)).ExampleTuiPromptModule,
+        data: {
+            title: `Prompt`,
+        },
+    },
+    {
         path: `components/theme-switcher`,
         loadChildren: async () =>
             (await import(`../components/theme-switcher/theme-switcher.module`))
@@ -962,57 +1022,48 @@ export const ROUTES = [
     },
     // EDITOR
     {
-        path: `editor/getting-started`,
+        path: `editor/API`,
         loadChildren: async () =>
-            (await import(`../components/editor/getting-started/editor.module`))
-                .ExampleTuiEditorModule,
+            (await import(`../components/editor/starter/editor-starter.module`))
+                .ExampleTuiEditorStarterModule,
         data: {
-            title: `Editor  — Getting started`,
+            title: `Editor  — Starter Kit`,
         },
     },
     {
-        path: `editor/custom-tool`,
-        loadChildren: async () =>
-            (await import(`../components/editor/custom-tool/editor-custom-tool.module`))
-                .ExampleTuiEditorCustomToolModule,
-        data: {
-            title: `Editor — Custom tool`,
-        },
-    },
-    {
-        path: `editor/resizable-images`,
+        path: `editor/custom-tool/paste-emoji`,
         loadChildren: async () =>
             (
                 await import(
-                    `../components/editor/resizable-images/editor-resizable-images.module`
+                    `../components/editor/custom-tool/paste-emoji/editor-paste-emoji.module`
                 )
-            ).ExampleTuiEditorResizableImagesToolModule,
+            ).ExampleTuiEditorPasteEmojiToolModule,
         data: {
-            title: `Editor  — Resizable images`,
+            title: `Editor — Paste emoji custom tool`,
         },
     },
     {
-        path: `editor/preview-images`,
+        path: `editor/custom-tool/color-picker`,
         loadChildren: async () =>
             (
                 await import(
-                    `../components/editor/preview-images/editor-preview-images.module`
+                    `../components/editor/custom-tool/color-picker/editor-color-picker.module`
                 )
-            ).ExampleTuiEditorPreviewImagesToolModule,
+            ).ExampleTuiEditorColorPickerToolModule,
         data: {
-            title: `Editor  — Preview images`,
+            title: `Editor — Color picker custom tool`,
         },
     },
     {
-        path: `editor/processing-content`,
+        path: `editor/custom-tool/paste-image`,
         loadChildren: async () =>
             (
                 await import(
-                    `../components/editor/processing-content/editor-processing-content.module`
+                    `../components/editor/custom-tool/paste-image/editor-paste-image-tool.module`
                 )
-            ).ExampleTuiEditorProcessingContentModule,
+            ).ExampleTuiEditorPasteImageToolModule,
         data: {
-            title: `Editor — Processing content`,
+            title: `Editor — Paste image custom tool`,
         },
     },
     {
@@ -1025,15 +1076,12 @@ export const ROUTES = [
         },
     },
     {
-        path: `editor/uploading-images`,
+        path: `editor/focus`,
         loadChildren: async () =>
-            (
-                await import(
-                    `../components/editor/uploading-images/editor-uploading-images.module`
-                )
-            ).ExampleTuiEditorUploadingImagesModule,
+            (await import(`../components/editor/focus/editor-focus.module`))
+                .ExampleTuiEditorFocusModule,
         data: {
-            title: `Editor — Uploading images`,
+            title: `Editor — Focus`,
         },
     },
     {
@@ -1055,21 +1103,123 @@ export const ROUTES = [
         },
     },
     {
-        path: `editor/markdown`,
+        path: `editor/highlight/text`,
         loadChildren: async () =>
-            (await import(`../components/editor/markdown/editor-markdown.module`))
-                .ExampleTuiEditorMarkdownModule,
+            (await import(`../components/editor/highlight/text/editor-mark-text.module`))
+                .ExampleTuiEditorMarkTextModule,
+        data: {
+            title: `Editor — Highlight text`,
+        },
+    },
+    {
+        path: `editor/highlight/code`,
+        loadChildren: async () =>
+            (await import(`../components/editor/highlight/code/editor-code-block.module`))
+                .ExampleTuiEditorCodeBlockModule,
+        data: {
+            title: `Editor — Highlight code`,
+        },
+    },
+    {
+        path: `editor/processing/legacy-html`,
+        loadChildren: async () =>
+            (
+                await import(
+                    `../components/editor/processing/legacy-html/editor-legacy-html.module`
+                )
+            ).ExampleTuiEditorLegacyHtmlModule,
+        data: {
+            title: `Editor — Legacy html`,
+        },
+    },
+    {
+        path: `editor/processing/cleanup-html`,
+        loadChildren: async () =>
+            (
+                await import(
+                    `../components/editor/processing/cleanup-html/editor-cleanup-html.module`
+                )
+            ).ExampleTuiEditorCleanupHtmlModule,
+        data: {
+            title: `Editor — Cleanup html`,
+        },
+    },
+    {
+        path: `editor/processing/markdown`,
+        loadChildren: async () =>
+            (
+                await import(
+                    `../components/editor/processing/markdown/editor-markdown.module`
+                )
+            ).ExampleTuiEditorMarkdownModule,
         data: {
             title: `Editor — Markdown`,
         },
     },
     {
-        path: `editor/embed`,
+        path: `editor/images/resizable`,
         loadChildren: async () =>
-            (await import(`../components/editor/embed/editor-embed.module`))
-                .ExampleTuiEditorEmbedModule,
+            (
+                await import(
+                    `../components/editor/images/resizable/editor-resizable-images.module`
+                )
+            ).ExampleTuiEditorResizableImagesToolModule,
         data: {
-            title: `Editor — Embed`,
+            title: `Editor  — Resizable images`,
+        },
+    },
+    {
+        path: `editor/images/preview`,
+        loadChildren: async () =>
+            (
+                await import(
+                    `../components/editor/images/preview/editor-preview-images.module`
+                )
+            ).ExampleTuiEditorPreviewImagesToolModule,
+        data: {
+            title: `Editor  — Preview images`,
+        },
+    },
+    {
+        path: `editor/images/upload`,
+        loadChildren: async () =>
+            (
+                await import(
+                    `../components/editor/images/upload/editor-upload-images.module`
+                )
+            ).ExampleTuiEditorUploadImagesModule,
+        data: {
+            title: `Editor — Upload images`,
+        },
+    },
+    {
+        path: `editor/embed/youtube`,
+        loadChildren: async () =>
+            (
+                await import(
+                    `../components/editor/embed/youtube/editor-embed-youtube.module`
+                )
+            ).ExampleTuiEditorEmbedYoutubeModule,
+        data: {
+            title: `Editor — Youtube`,
+        },
+    },
+    {
+        path: `editor/embed/iframe`,
+        loadChildren: async () =>
+            (await import(`../components/editor/embed/iframe/editor-embed-iframe.module`))
+                .ExampleTuiEditorEmbedIframeModule,
+        data: {
+            title: `Editor — Iframe`,
+        },
+    },
+    {
+        path: `editor/embed/html5`,
+        loadChildren: async () =>
+            (await import(`../components/editor/embed/html5/editor-embed-html5.module`))
+                .ExampleTuiEditorEmbedHtml5Module,
+        data: {
+            title: `Editor — HTML5`,
         },
     },
     // FILTER
@@ -1183,13 +1333,6 @@ export const ROUTES = [
         loadChildren: async () => (await import(`../markup/form/form.module`)).FormModule,
         data: {
             title: `Form`,
-        },
-    },
-    {
-        path: `grid`,
-        loadChildren: async () => (await import(`../markup/grid/grid.module`)).GridModule,
-        data: {
-            title: `Grid`,
         },
     },
     {
@@ -1422,6 +1565,15 @@ export const ROUTES = [
         },
     },
     {
+        path: `directives/hovered-change`,
+        loadChildren: async () =>
+            (await import(`../directives/hovered-change/hovered-change.module`))
+                .ExampleTuiHoveredChangeModule,
+        data: {
+            title: `HoveredChange`,
+        },
+    },
+    {
         path: `components/reorder`,
         loadChildren: async () =>
             (await import(`../tables/reorder/reorder.module`)).ExampleTuiReorderModule,
@@ -1491,6 +1643,15 @@ export const ROUTES = [
         },
     },
     {
+        path: `directives/value-changes`,
+        loadChildren: async () =>
+            (await import(`../directives/value-changes/value-changes.module`))
+                .ExampleTuiValueChangesModule,
+        data: {
+            title: `ValueChanges`,
+        },
+    },
+    {
         path: `directives/media`,
         loadChildren: async () =>
             (await import(`../directives/media/media.module`)).ExampleTuiMediaModule,
@@ -1539,6 +1700,14 @@ export const ROUTES = [
                 .ExampleTuiFilterByInputModule,
         data: {
             title: `FilterByInput`,
+        },
+    },
+    {
+        path: `pipes/flag`,
+        loadChildren: async () =>
+            (await import(`../pipes/flag/flag.module`)).ExampleTuiFlagModule,
+        data: {
+            title: `Flag`,
         },
     },
     {
@@ -1611,6 +1780,15 @@ export const ROUTES = [
             (await import(`../services/alerts/alerts.module`)).ExampleTuiAlertsModule,
         data: {
             title: `AlertService`,
+        },
+    },
+    {
+        path: `services/breakpoint-service`,
+        loadChildren: async () =>
+            (await import(`../services/breakpoint/breakpoint.module`))
+                .ExampleTuiBreakpointModule,
+        data: {
+            title: `BreakpointService`,
         },
     },
     {
@@ -1756,7 +1934,18 @@ export const ROUTES = [
             title: `Stackblitz Starter`,
         },
     },
-    {path: `**`, redirectTo: ``},
+    {
+        path: `cypress`,
+        loadChildren: async () =>
+            import(`../cypress/cypress.module`).then(m => m.CypressDocPageModule),
+        data: {
+            title: `Cypress tests 🤫`,
+        },
+    },
+    {
+        path: `**`,
+        redirectTo: ``,
+    },
 ];
 
 @NgModule({

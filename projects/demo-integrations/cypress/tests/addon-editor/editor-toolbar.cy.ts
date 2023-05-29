@@ -17,8 +17,8 @@ describe(`Editor's toolbar`, () => {
         tuiGetDemoContent()
             .findByAutomationId(`toolbar__hilite-button`)
             .should(`be.visible`)
-            .click()
-            .trigger(`mouseleave`);
+            .click({force: true})
+            .trigger(`mouseleave`, {force: true});
 
         tuiGetDemoContent()
             .tuiWaitBeforeScreenshot()
@@ -44,7 +44,7 @@ describe(`Editor's toolbar`, () => {
     });
 
     it(`has the possibility to add custom tool`, () => {
-        cy.tuiVisit(`editor/custom-tool`);
+        cy.tuiVisit(`editor/custom-tool/paste-emoji`);
 
         cy.get(`#custom-tool`)
             .findByAutomationId(`tui-doc-example`)
@@ -135,7 +135,7 @@ describe(`Editor's toolbar`, () => {
             .should(`be.visible`)
             .click();
 
-        cy.get(`button[icon="tuiIconViewListLarge"].t-option`)
+        cy.get(`button[icon="tuiIconListLarge"].t-option`)
             .should(`be.visible`)
             .click({force: true});
 
@@ -175,9 +175,7 @@ describe(`Editor's toolbar`, () => {
                 .find(`button[icon="tuiIconAlignLeftLarge"]`)
                 .as(`initialTool`);
             cy.get(`@wrapper`).find(`button[icon="tuiIconFormatLarge"]`).as(`leftTool`);
-            cy.get(`@wrapper`)
-                .find(`button[icon="tuiIconViewListLarge"]`)
-                .as(`rightTool`);
+            cy.get(`@wrapper`).find(`button[icon="tuiIconListLarge"]`).as(`rightTool`);
 
             cy.get(`@initialTool`).tuiFocus();
 
@@ -222,7 +220,7 @@ describe(`Editor's toolbar`, () => {
         });
 
         it(`works with custom tools`, () => {
-            cy.tuiVisit(`editor/custom-tool`);
+            cy.tuiVisit(`editor/custom-tool/paste-emoji`);
 
             cy.get(`#custom-tool`)
                 .findByAutomationId(`tui-doc-example`)

@@ -1,14 +1,36 @@
 {
+    "name": "icons",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "root": "projects/icons",
     "sourceRoot": "projects/icons/src",
     "projectType": "library",
     "prefix": "tui",
     "implicitDependencies": ["!testing"],
-    "architect": {
+    "targets": {
+        "lint": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "eslint --no-error-on-unmatched-pattern \"**/projects/icons/**/*\""
+            }
+        },
+        "stylelint": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "stylelint \"**/icons/**/*.{css,less}\" --allow-empty-input"
+            }
+        },
+        "build": {
+            "executor": "@angular-devkit/build-angular:ng-packagr",
+            "outputs": ["dist/icons"],
+            "options": {
+                "tsConfig": "tsconfig.build.json",
+                "project": "projects/icons/ng-package.json"
+            }
+        },
         "preprocess": {
             "executor": "nx:run-commands",
             "options": {
-                "command": "ts-node ./scripts/preprocess-icons.ts"
+                "command": "ts-node ./projects/icons/scripts/prepare-feather-icons.ts && ts-node ./scripts/preprocess-icons.ts"
             }
         },
         "prebuild": {
@@ -24,26 +46,11 @@
                 }
             ]
         },
-        "build": {
-            "builder": "@angular-devkit/build-angular:ng-packagr",
-            "outputs": ["dist/icons"],
-            "options": {
-                "tsConfig": "tsconfig.build.json",
-                "project": "projects/icons/ng-package.json"
-            },
-            "dependsOn": [
-                {
-                    "target": "prebuild",
-                    "projects": "self",
-                    "params": "forward"
-                }
-            ]
-        },
         "test": {
             "executor": "nx:run-commands",
             "outputs": ["coverage/icons"],
             "options": {
-                "command": "jest --testMatch '**/projects/icons/**/*.spec.ts'",
+                "command": "jest --testMatch \"**/projects/icons/**/*.spec.ts\"",
                 "forwardAllArgs": true
             }
         },

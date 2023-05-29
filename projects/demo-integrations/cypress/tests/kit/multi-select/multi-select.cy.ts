@@ -2,7 +2,7 @@ describe(`MultiSelect`, () => {
     describe(`Description and examples page`, () => {
         beforeEach(() => {
             cy.viewport(`macbook-13`);
-            cy.tuiVisit(`components/multi-select`);
+            cy.tuiVisit(`components/multi-select`, {stopAnimation: false});
         });
 
         it(`does not overflow arrow icon by many tags`, () => {
@@ -37,10 +37,12 @@ describe(`MultiSelect`, () => {
                         .click({force: true});
                 });
 
-                cy.get(`tui-dialog`).matchImageSnapshot(
-                    `04-multi-select-inside-dialog-with-field-size-${size}`,
-                    {capture: `viewport`},
-                );
+                cy.get(`tui-dialog`)
+                    .tuiWaitBeforeAction()
+                    .matchImageSnapshot(
+                        `04-multi-select-inside-dialog-with-field-size-${size}`,
+                        {capture: `viewport`},
+                    );
             });
         });
     });
@@ -53,6 +55,7 @@ describe(`MultiSelect`, () => {
                 it(`tuiTextfieldSize=${size}`, () => {
                     cy.tuiVisit(
                         `components/multi-select/API?tuiMode=null&tuiTextfieldCleaner=true&tuiTextfieldSize=${size}`,
+                        {stopAnimation: false},
                     );
 
                     cy.getByAutomationId(`tui-multi-select__arrow`).click({force: true});
@@ -75,7 +78,7 @@ describe(`MultiSelect`, () => {
         describe(`Form changes by updateOn`, () => {
             [`submit`, `blur`, `change`].forEach(type => {
                 it(`updateOn: ${type}`, () => {
-                    cy.tuiVisit(`components/multi-select/API`);
+                    cy.tuiVisit(`components/multi-select/API`, {stopAnimation: false});
 
                     cy.getByAutomationId(`tui-demo-button__toggle-details`)
                         .click()
@@ -141,7 +144,9 @@ describe(`MultiSelect`, () => {
     });
 
     it(`checking that the arrow icon is rotated when enabled tuiTextfieldCleaner`, () => {
-        cy.tuiVisit(`components/multi-select/API?tuiMode=null&tuiTextfieldCleaner=true`);
+        cy.tuiVisit(`components/multi-select/API?tuiMode=null&tuiTextfieldCleaner=true`, {
+            stopAnimation: false,
+        });
 
         cy.getByAutomationId(`tui-multi-select__arrow`).click({force: true});
 
@@ -168,7 +173,9 @@ describe(`MultiSelect`, () => {
     });
 
     it(`should scroll to end on focus`, () => {
-        cy.tuiVisit(`components/multi-select/API?expandable=false&sandboxWidth=350`);
+        cy.tuiVisit(`components/multi-select/API?expandable=false&sandboxWidth=350`, {
+            stopAnimation: false,
+        });
         cy.getByAutomationId(`tui-multi-select__arrow`).click({force: true});
 
         [0, 1, 2, 3, 4].forEach(index => {
@@ -186,5 +193,19 @@ describe(`MultiSelect`, () => {
         cy.tuiWaitBeforeAction().matchImageSnapshot(`03-multi-select-scroll-to-end`, {
             capture: `viewport`,
         });
+    });
+
+    it(`multi-select with data list`, () => {
+        cy.tuiVisit(`components/multi-select#datalist`);
+
+        cy.get(`tui-doc-example[heading="DataList"]`)
+            .tuiScrollIntoView()
+            .findByAutomationId(`tui-multi-select__arrow`)
+            .click({force: true});
+
+        cy.get(`tui-dropdown`)
+            .find(`tui-data-list[role="listbox"]`)
+            .tuiWaitBeforeScreenshot()
+            .matchImageSnapshot(`multi-select-with-data-list`);
     });
 });

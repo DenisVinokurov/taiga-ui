@@ -56,6 +56,7 @@ export class StackblitzDepsService {
             '@taiga-ui/addon-preview': version,
             '@taiga-ui/addon-table': version,
             '@taiga-ui/addon-tablebars': version,
+            '@taiga-ui/layout': version,
         };
     }
 
@@ -76,6 +77,9 @@ export class StackblitzDepsService {
                 kitDeps[`@ng-web-apis/intersection-observer`],
             '@ng-web-apis/resize-observer': cdkDeps[`@ng-web-apis/resize-observer`],
             '@ng-web-apis/mutation-observer': cdkDeps[`@ng-web-apis/mutation-observer`],
+            '@maskito/angular': kitDeps[`@maskito/angular`],
+            '@maskito/core': kitDeps[`@maskito/core`],
+            '@maskito/kit': kitDeps[`@maskito/kit`],
             'text-mask-core': kitDeps[`text-mask-core`],
             'zone.js': rootDeps[`zone.js`],
             dompurify: demoDeps.dompurify,

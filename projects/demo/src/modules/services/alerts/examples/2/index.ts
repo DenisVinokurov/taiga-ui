@@ -19,13 +19,10 @@ export class TuiAlertsExampleComponent2 {
 
     money = 1000;
 
-    constructor(
-        @Inject(TuiAlertService)
-        private readonly alertService: TuiAlertService,
-    ) {}
+    constructor(@Inject(TuiAlertService) private readonly alerts: TuiAlertService) {}
 
     showWithdrawAlert(): void {
-        this.alertService
+        this.alerts
             .open(this.withdrawTemplate || '', {
                 label: 'A template sample',
                 status: TuiNotification.Warning,
@@ -35,7 +32,7 @@ export class TuiAlertsExampleComponent2 {
     }
 
     showDepositAlert(): void {
-        this.alertService
+        this.alerts
             .open(this.depositTemplate || '', {
                 label: 'A template sample',
                 status: TuiNotification.Success,

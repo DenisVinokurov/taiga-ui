@@ -55,14 +55,14 @@ export class TuiCheckboxLabeledComponent
         @Self()
         @Inject(NgControl)
         control: NgControl | null,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
         @Optional()
         @Inject(TuiModeDirective)
         private readonly modeDirective: TuiModeDirective | null,
         @Inject(TUI_CHECKBOX_OPTIONS)
         private readonly options: TuiCheckboxOptions,
     ) {
-        super(control, changeDetectorRef);
+        super(control, cdr);
     }
 
     get focused(): boolean {
@@ -82,7 +82,8 @@ export class TuiCheckboxLabeledComponent
         this.updateFocused(focused);
     }
 
+    /** @deprecated use 'value' setter */
     onModelChange(value: boolean): void {
-        this.updateValue(value);
+        this.value = value;
     }
 }

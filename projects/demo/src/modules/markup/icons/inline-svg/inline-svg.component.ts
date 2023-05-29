@@ -1,15 +1,10 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {TUI_SANITIZER} from '@taiga-ui/core';
 import {NgDompurifySanitizer} from '@tinkoff/ng-dompurify';
 
 @Component({
     selector: 'inline-svg-example',
-    template: `
-        <tui-svg
-            class="example"
-            [src]="svg"
-        ></tui-svg>
-    `,
+    templateUrl: './inline-svg.component.html',
     styleUrls: ['./inline-svg.style.less'],
     providers: [
         {
@@ -17,6 +12,7 @@ import {NgDompurifySanitizer} from '@tinkoff/ng-dompurify';
             useClass: NgDompurifySanitizer,
         },
     ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InlineSvgExampleComponent {
     svg = `

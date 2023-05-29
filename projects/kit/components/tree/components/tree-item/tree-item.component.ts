@@ -49,13 +49,13 @@ export class TuiTreeItemComponent implements DoCheck {
     );
 
     readonly attached$ = this.change$.pipe(
-        map(() => this.elementRef.nativeElement.isConnected),
+        map(() => this.el.nativeElement.isConnected),
         distinctUntilChanged(),
     );
 
     constructor(
         @Inject(ElementRef)
-        private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly el: ElementRef<HTMLElement>,
         @Inject(forwardRef(() => TUI_TREE_CONTROLLER))
         private readonly controller: TuiTreeController,
         @Inject(forwardRef(() => TUI_TREE_LEVEL))
@@ -74,6 +74,10 @@ export class TuiTreeItemComponent implements DoCheck {
     }
 
     ngDoCheck(): void {
+        this.checkChanges();
+    }
+
+    checkChanges(): void {
         this.change$.next();
     }
 }

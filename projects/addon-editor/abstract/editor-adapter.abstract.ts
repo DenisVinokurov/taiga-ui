@@ -1,7 +1,9 @@
 import {Directive} from '@angular/core';
-import {TuiYoutubeOptions} from '@taiga-ui/addon-editor/extensions/youtube';
-import {TuiEditorAttachedFile} from '@taiga-ui/addon-editor/interfaces';
+import type {TuiEditableIframe} from '@taiga-ui/addon-editor/extensions/iframe-editor';
+import type {TuiYoutubeOptions} from '@taiga-ui/addon-editor/extensions/youtube';
+import type {TuiEditorAttachedFile} from '@taiga-ui/addon-editor/interfaces';
 import type {Editor, Range} from '@tiptap/core';
+import type {MarkType} from '@tiptap/pm/model';
 import type {EditorState} from 'prosemirror-state';
 import {Observable, Subject} from 'rxjs';
 
@@ -59,6 +61,17 @@ export abstract class AbstractTuiEditor {
     abstract canSplitCells(): boolean;
     abstract splitCell(): void;
     abstract setHeading(level: number): void;
+    abstract removeEmptyTextStyle(): void;
+    abstract toggleMark(
+        typeOrName: MarkType | string,
+        attributes?: Record<string, any>,
+        options?: {
+            /**
+             * Removes the mark even across the current selection. Defaults to `false`.
+             */
+            extendEmptyMarkRange?: boolean;
+        },
+    ): void;
     abstract setParagraph(options?: {fontSize: string}): void;
     abstract setHardBreak(): void;
     abstract setTextSelection(value: Range | number): void;
@@ -81,4 +94,5 @@ export abstract class AbstractTuiEditor {
     abstract removeAnchor(): void;
     abstract setFileLink(preview: TuiEditorAttachedFile): void;
     abstract setYoutubeVideo(options: TuiYoutubeOptions): void;
+    abstract setIframe(options: TuiEditableIframe): void;
 }

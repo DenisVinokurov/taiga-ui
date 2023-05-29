@@ -1,5 +1,3 @@
-console.log('Compiling typescript files by tsconfig...');
-
 module.exports = {
     overrides: [
         {
@@ -12,49 +10,96 @@ module.exports = {
             parser: '@typescript-eslint/parser',
             plugins: ['@typescript-eslint'],
             rules: {
+                'unicorn/prefer-logical-operator-over-ternary': 'error',
+                '@typescript-eslint/require-array-sort-compare': 'error',
+                '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+                '@typescript-eslint/no-unnecessary-type-constraint': 'error',
+                '@typescript-eslint/no-unsafe-declaration-merging': 'error',
+                '@typescript-eslint/prefer-as-const': 'error',
+                '@typescript-eslint/prefer-string-starts-ends-with': 'error',
+                '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+                '@typescript-eslint/prefer-for-of': 'error',
+                '@typescript-eslint/no-unnecessary-qualifier': 'error',
+                '@typescript-eslint/restrict-plus-operands': 'error',
+                '@typescript-eslint/no-extra-non-null-assertion': 'error',
+                '@typescript-eslint/no-unnecessary-type-arguments': 'error',
+                '@typescript-eslint/type-annotation-spacing': 'error',
                 '@typescript-eslint/quotes': ['error', 'backtick'],
-                '@typescript-eslint/prefer-nullish-coalescing': 'off',
-                'no-restricted-syntax': [
+                '@typescript-eslint/member-delimiter-style': 'error',
+                '@typescript-eslint/func-call-spacing': 'error',
+                '@typescript-eslint/no-useless-constructor': 'error',
+                '@typescript-eslint/no-use-before-define': 'error',
+                '@typescript-eslint/no-unused-vars': 'error',
+                '@typescript-eslint/consistent-generic-constructors': 'error',
+                '@typescript-eslint/consistent-type-assertions': [
                     'error',
                     {
-                        selector: "CallExpression[callee.name='mapTo']",
-                        message:
-                            'Use `map(() => value)` instead of `mapTo(value)`, the operator is deprecated',
+                        assertionStyle: 'as',
+                        objectLiteralTypeAssertions: 'allow-as-parameter',
                     },
-                    {
-                        selector: `ArrowFunctionExpression[params.length=0][body.raw='false'][body.value='false']`,
-                        message:
-                            'Use `ALWAYS_FALSE_HANDLER` please instead of `() => false`',
-                    },
-                    {
-                        selector: `ArrowFunctionExpression[params.length=0][body.raw='true'][body.value='true']`,
-                        message:
-                            'Use `ALWAYS_TRUE_HANDLER` please instead of `() => true`',
-                    },
-                    {
-                        selector: "CallExpression[callee.name='switchMapTo']",
-                        message:
-                            'Use `switchMap(() => stream$)` instead of `switchMapTo(stream$)`, the operator is deprecated',
-                    },
-                    {
-                        selector: "CallExpression[callee.name='flatMap']",
-                        message:
-                            'Use `mergeMap` instead of `flatMap`, the operator is deprecated',
-                    },
-                    {
-                        selector: "CallExpression[callee.name='pluck']",
-                        message:
-                            "Use `map(x => x?.foo?.bar)` instead of `pluck('foo', 'bar')`",
-                    },
-                    /**
-                     * TODO: enable after upgrade to RxJS 7
-                     */
-                    /*{
-                        selector: "CallExpression[callee.name='repeatWhen']",
-                        message:
-                            'Use `repeat({ delay: () => notify$ })` instead of `repeatWhen(() => notify$)`',
-                    },*/
                 ],
+                '@typescript-eslint/no-confusing-non-null-assertion': 'error',
+                '@typescript-eslint/switch-exhaustiveness-check': 'error',
+                '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
+                '@typescript-eslint/triple-slash-reference': [
+                    'error',
+                    {path: 'always', types: 'always', lib: 'always'},
+                ],
+                '@typescript-eslint/consistent-type-definitions': 'error',
+                '@typescript-eslint/no-duplicate-enum-values': 'error',
+                '@typescript-eslint/no-implied-eval': 'error',
+                '@typescript-eslint/ban-types': [
+                    'error',
+                    {
+                        types: {
+                            String: {
+                                message: 'Use string instead',
+                                fixWith: 'string',
+                            },
+                            Boolean: {
+                                message: 'Use boolean instead',
+                                fixWith: 'boolean',
+                            },
+                            Number: {
+                                message: 'Use number instead',
+                                fixWith: 'number',
+                            },
+                            Symbol: {
+                                message: 'Use symbol instead',
+                                fixWith: 'symbol',
+                            },
+                            BigInt: {
+                                message: 'Use bigint instead',
+                                fixWith: 'bigint',
+                            },
+                            Function: {
+                                message: [
+                                    'The `Function` type accepts any function-like value.',
+                                    'It provides no type safety when calling the function, which can be a common source of bugs.',
+                                    'It also accepts things like class declarations, which will throw at runtime as they will not be called with `new`.',
+                                    'If you are expecting the function to accept certain arguments, you should explicitly define the function shape.',
+                                ].join('\n'),
+                            },
+                            Object: {
+                                message: [
+                                    'The `Object` type actually means "any non-nullish value", so it is marginally better than `unknown`.',
+                                    '- If you want a type meaning "any object", you probably want `object` instead.',
+                                    '- If you want a type meaning "any value", you probably want `unknown` instead.',
+                                ].join('\n'),
+                            },
+                            '{}': {
+                                message: [
+                                    '`{}` actually means "any non-nullish value".',
+                                    '- If you want a type meaning "any object", you probably want `object` instead.',
+                                    '- If you want a type meaning "any value", you probably want `unknown` instead.',
+                                    '- If you want a type meaning "empty object", you probably want `Record<string, never>` instead.',
+                                ].join('\n'),
+                            },
+                        },
+                        extendDefaults: true,
+                    },
+                ],
+                '@typescript-eslint/prefer-includes': 'error',
             },
         },
         {

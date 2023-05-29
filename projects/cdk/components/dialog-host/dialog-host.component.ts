@@ -7,8 +7,11 @@ import {TuiDialog} from '@taiga-ui/cdk/types';
 import {combineLatest, Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
+/**
+ * Is closing dialog on browser backward navigation enabled
+ */
 export const TUI_DIALOG_CLOSES_ON_BACK = new InjectionToken<Observable<boolean>>(
-    '[TUI_DIALOG_CLOSES_ON_BACK]: Is closing dialog on browser backward navigation enabled',
+    '[TUI_DIALOG_CLOSES_ON_BACK]',
     {
         factory: () => of(false),
     },
@@ -25,6 +28,7 @@ const isFakeHistoryState = (
     templateUrl: './dialog-host.template.html',
     styleUrls: ['./dialog-host.style.less'],
     // So that we do not force OnPush on custom dialogs
+    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
     changeDetection: ChangeDetectionStrategy.Default,
     animations: [TUI_PARENT_ANIMATION],
 })

@@ -36,11 +36,26 @@ export class TuiFontSizeComponent {
         >,
     ) {}
 
+    /**
+     * @deprecated:
+     * use {@link setFontOption}
+     */
     onClick({headingLevel, px}: Partial<TuiEditorFontOption>): void {
+        this.setFontOption({headingLevel, px});
+    }
+
+    setFontOption({headingLevel, px}: Partial<TuiEditorFontOption>): void {
+        this.clearPreviousTextStyles();
+
         if (headingLevel) {
             this.editor.setHeading(headingLevel);
         } else {
             this.editor.setParagraph({fontSize: tuiPx(px || 0)});
         }
+    }
+
+    private clearPreviousTextStyles(): void {
+        this.editor.removeEmptyTextStyle();
+        this.editor.toggleMark('textStyle');
     }
 }

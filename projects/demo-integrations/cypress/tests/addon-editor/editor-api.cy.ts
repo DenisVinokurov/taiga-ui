@@ -17,12 +17,16 @@ import {
 } from '@demo-integrations/support/editor/helpers';
 import {
     HTML_EDITOR_EXAMPLE_BLOCKQUOTE,
+    HTML_EDITOR_EXAMPLE_DETAILS,
+    HTML_EDITOR_EXAMPLE_HIGHLIGHT_BLOCK,
+    HTML_EDITOR_EXAMPLE_LEGACY_DETAILS,
     HTML_EDITOR_EXAMPLE_LONG_WORD_UL,
     HTML_EDITOR_EXAMPLE_NESTED_OL_UL,
     HTML_EDITOR_EXAMPLE_NESTED_UL,
     HTML_EDITOR_EXAMPLE_PRE_CODE,
     HTML_EDITOR_EXAMPLE_TABLE,
     HTML_EDITOR_EXAMPLE_UL,
+    HTML_EDITOR_EXAMPLE_WITH_DETAILS_INSIDE_LIST,
 } from '@demo-integrations/support/editor/html';
 
 describe(`Editor API`, () => {
@@ -49,7 +53,7 @@ describe(`Editor API`, () => {
                     tuiOpenFontTool()
                         .findByAutomationId(`tui_font__${type.toLowerCase()}`)
                         .tuiWaitBeforeScreenshot()
-                        .click();
+                        .click({force: true});
 
                     tuiGetContentEditable()
                         .type(`${type}{enter}`)
@@ -71,7 +75,6 @@ describe(`Editor API`, () => {
                 .tuiWaitBeforeScreenshot()
                 .matchImageSnapshot(`1-1-dark-mode-input`);
 
-            cy.get(`@editor`).find(`tui-scrollbar`).scrollTo(0, 500);
             cy.get(`@editor`)
                 .tuiWaitBeforeScreenshot()
                 .matchImageSnapshot(`1-2-dark-mode-input`);
@@ -82,6 +85,46 @@ describe(`Editor API`, () => {
                 .find(`tui-editor-socket.tui-example`)
                 .tuiWaitBeforeScreenshot()
                 .matchImageSnapshot(`2-1-dark-mode-output`);
+        });
+    });
+
+    describe(`details`, () => {
+        it(`prevents extra margin between top border of details and content`, () => {
+            tuiVisitEditorApiPage({content: HTML_EDITOR_EXAMPLE_DETAILS});
+
+            tuiGetDemoContent()
+                .tuiWaitBeforeScreenshot()
+                .matchImageSnapshot(`prevents-extra-margin-details`);
+        });
+
+        it(`legacy`, () => {
+            tuiVisitEditorApiPage({content: ``});
+
+            cy.get(`.t-table tr`)
+                .eq(2)
+                .findByAutomationId(`tui-primitive-textfield__native-input`)
+                .type(HTML_EDITOR_EXAMPLE_LEGACY_DETAILS, {force: true, delay: 0});
+
+            tuiGetDemoContent().tuiWaitBeforeScreenshot().matchImageSnapshot(`legacy`);
+        });
+    });
+
+    describe(`highlight`, () => {
+        it(`code + pre/code`, () => {
+            tuiVisitEditorApiPage({content: ``});
+
+            cy.get(`.t-table tr`)
+                .eq(2)
+                .findByAutomationId(`tui-primitive-textfield__native-input`)
+                .type(HTML_EDITOR_EXAMPLE_HIGHLIGHT_BLOCK, {
+                    delay: 0,
+                    force: true,
+                    parseSpecialCharSequences: false,
+                });
+
+            tuiGetDemoContent()
+                .tuiWaitBeforeScreenshot()
+                .matchImageSnapshot(`code-block-highlight`);
         });
     });
 
@@ -128,7 +171,7 @@ describe(`Editor API`, () => {
 
             cy.get(`@wrapper`).find(tuiGetTipTapContentSelector()).as(`editor`);
 
-            toggleBullet(`tuiIconViewListLarge`);
+            toggleBullet(`tuiIconListLarge`);
 
             cy.get(`@editor`).type(`1{enter}`).type(`{enter}`);
 
@@ -140,7 +183,7 @@ describe(`Editor API`, () => {
                 .matchImageSnapshot(`6-1-bullet-and-ordered-list`);
 
             clearEditor();
-            toggleBullet(`tuiIconViewListLarge`);
+            toggleBullet(`tuiIconListLarge`);
 
             cy.get(`@editor`).type(
                 `first line{shift+enter}second line{shift+enter}third line{shift+enter}{enter}first line`,
@@ -166,7 +209,7 @@ describe(`Editor API`, () => {
 
             cy.get(`@wrapper`).find(tuiGetTipTapContentSelector()).as(`editor`);
 
-            toggleBullet(`tuiIconViewListLarge`);
+            toggleBullet(`tuiIconListLarge`);
             cy.get(`@editor`).type(`1{enter}`);
             cy.get(`@editor`).type(`2`);
             toggleBullet(`tuiIconIndentLarge`);
@@ -207,7 +250,7 @@ describe(`Editor API`, () => {
 
         function toggleBullet(iconType: string): void {
             cy.get(`@wrapper`)
-                .find(`button[icon="tuiIconViewListLarge"]`)
+                .find(`button[icon="tuiIconListLarge"]`)
                 .click({force: true});
             cy.get(`tui-dropdown`)
                 .find(`button[icon="${iconType}"]`)
@@ -220,7 +263,7 @@ describe(`Editor API`, () => {
     });
 
     describe(`Editor and Dropdown`, () => {
-        beforeEach(() => tuiVisitEditorApiPage());
+        beforeEach(() => tuiVisitEditorApiPage({maxHeight: 400}));
 
         it(`should not overlap tools`, () => {
             tuiFocusToStartInEditor();
@@ -231,7 +274,7 @@ describe(`Editor API`, () => {
 
             tuiClearHint();
 
-            tuiOpenAnchorDropdown({containHref: `http://wysiwyg.com`});
+            tuiOpenAnchorDropdown({containHref: `https://wysiwyg.com`});
             tuiGetEditorScrollbarArea().scrollTo(0, 100);
             tuiGetScreenshotArea().matchImageSnapshot(`8-1-added-new-link`);
 
@@ -287,5 +330,18 @@ describe(`Editor API`, () => {
                     .matchImageSnapshot(`tui-editor-socket.tui-example-${heading}`);
             });
         }
+    });
+
+    describe(`Details inside list`, () => {
+        it(`support break line`, () => {
+            tuiVisitEditorApiPage({
+                content: HTML_EDITOR_EXAMPLE_WITH_DETAILS_INSIDE_LIST,
+            });
+
+            tuiGetDemoContent()
+                .find(`[tuiTiptapEditor]`)
+                .tuiWaitBeforeScreenshot()
+                .matchImageSnapshot(`details-inside-list-in-editor`);
+        });
     });
 });

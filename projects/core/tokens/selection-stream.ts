@@ -4,24 +4,27 @@ import {tuiTypedFromEvent} from '@taiga-ui/cdk';
 import {merge, Observable} from 'rxjs';
 import {share, switchMap, takeUntil} from 'rxjs/operators';
 
+/**
+ * A stream of possible selection changes
+ */
 export const TUI_SELECTION_STREAM = new InjectionToken<Observable<unknown>>(
-    `[TUI_SELECTION_STREAM]: A stream of possible selection changes`,
+    `[TUI_SELECTION_STREAM]`,
     {
         factory: () => {
-            const documentRef = inject(DOCUMENT);
+            const doc = inject(DOCUMENT);
 
             return merge(
-                tuiTypedFromEvent(documentRef, `selectionchange`),
-                tuiTypedFromEvent(documentRef, `mouseup`),
-                tuiTypedFromEvent(documentRef, `mousedown`).pipe(
+                tuiTypedFromEvent(doc, `selectionchange`),
+                tuiTypedFromEvent(doc, `mouseup`),
+                tuiTypedFromEvent(doc, `mousedown`).pipe(
                     switchMap(() =>
-                        tuiTypedFromEvent(documentRef, `mousemove`).pipe(
-                            takeUntil(tuiTypedFromEvent(documentRef, `mouseup`)),
+                        tuiTypedFromEvent(doc, `mousemove`).pipe(
+                            takeUntil(tuiTypedFromEvent(doc, `mouseup`)),
                         ),
                     ),
                 ),
-                tuiTypedFromEvent(documentRef, `keydown`),
-                tuiTypedFromEvent(documentRef, `keyup`),
+                tuiTypedFromEvent(doc, `keydown`),
+                tuiTypedFromEvent(doc, `keyup`),
             ).pipe(share());
         },
     },

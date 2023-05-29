@@ -34,11 +34,12 @@
     </div>
 
     <tui-scrollbar
+        *ngIf="editorLoaded"
         tuiEditorPortal
         class="t-scrollbar"
+        (mousedown)="focus($event)"
     >
         <div
-            *ngIf="editorLoaded"
             tuiDropdownLimitWidth="auto"
             tuiDropdownSelectionPosition="tag"
             [tuiDropdownSelection]="dropdownSelectionHandler"

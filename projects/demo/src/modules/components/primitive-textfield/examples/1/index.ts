@@ -30,9 +30,9 @@ export class TuiPrimitiveTextfieldExample1 extends AbstractTuiControl<string> {
         @Self()
         @Inject(NgControl)
         control: NgControl | null,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
     ) {
-        super(control, changeDetectorRef);
+        super(control, cdr);
     }
 
     get nativeFocusableElement(): TuiNativeFocusableElement | null {
@@ -46,7 +46,7 @@ export class TuiPrimitiveTextfieldExample1 extends AbstractTuiControl<string> {
     }
 
     get icon(): string {
-        return this.isPasswordHidden ? 'tuiIconHideLarge' : 'tuiIconShowLarge';
+        return this.isPasswordHidden ? 'tuiIconEyeOffLarge' : 'tuiIconEyeLarge';
     }
 
     get hint(): string {
@@ -55,10 +55,6 @@ export class TuiPrimitiveTextfieldExample1 extends AbstractTuiControl<string> {
 
     get inputType(): string {
         return this.isPasswordHidden ? 'password' : 'text';
-    }
-
-    onValueChange(textValue: string): void {
-        this.updateValue(textValue);
     }
 
     onFocused(focused: boolean): void {

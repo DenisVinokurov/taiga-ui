@@ -2,8 +2,9 @@ import {waitAllRequests} from '@demo-integrations/support/helpers/wait-requests.
 import {stubExternalIcons} from '@demo-integrations/support/stubs/stub-external-icons.util';
 import {stubMetrics} from '@demo-integrations/support/stubs/stub-metrics';
 
+import {TUI_THEME_NIGHT_STORAGE_DEFAULT_KEY} from '../../../../addon-doc/services/theme-night.options';
+
 const NEXT_URL_STORAGE_KEY = `env`;
-const NIGHT_THEME_KEY = `night`;
 const REPEATED_SLASH_REG = new RegExp(`//`, `g`);
 
 interface TuiVisitOptions {
@@ -23,6 +24,7 @@ interface TuiVisitOptions {
     noSmoothScroll?: boolean;
     hideHeader?: boolean;
     hideNavigation?: boolean;
+    stopAnimation?: boolean;
     skipDecodingUrl?: boolean;
     skipExpectUrl?: boolean;
     waitRenderedFont?: RegExp;
@@ -38,13 +40,13 @@ interface TuiVisitOptions {
 }
 
 const setBeforeLoadOptions = (
-    windowRef: Window,
+    win: Window,
     {inIframe}: Pick<Required<TuiVisitOptions>, 'inIframe'>,
 ): void => {
     if (!inIframe) {
         // @ts-ignore window.parent is readonly property
         // eslint-disable-next-line @typescript-eslint/dot-notation
-        windowRef[`parent`] = windowRef;
+        win[`parent`] = win;
     }
 };
 
@@ -60,6 +62,7 @@ export function tuiVisit(path: string, options: TuiVisitOptions = {}): void {
         hideScrollbar = true,
         noSmoothScroll = true,
         hideHeader = true,
+        stopAnimation = true,
         skipExpectUrl = false,
         skipDecodingUrl = false,
         hideNavigation = true,
@@ -86,6 +89,9 @@ export function tuiVisit(path: string, options: TuiVisitOptions = {}): void {
               decodeURIComponent(path), // @note: prevent twice encoding
           );
 
+    // eslint-disable-next-line no-restricted-syntax
+    Cypress.on(`uncaught:exception`, () => false);
+
     cy.visit(`/`, {
         headers,
         onBeforeLoad: window => {
@@ -102,7 +108,10 @@ export function tuiVisit(path: string, options: TuiVisitOptions = {}): void {
             setBeforeLoadOptions(window, {inIframe});
 
             window.localStorage.setItem(NEXT_URL_STORAGE_KEY, nextUrl);
-            window.localStorage.setItem(NIGHT_THEME_KEY, enableNightMode.toString());
+            window.localStorage.setItem(
+                TUI_THEME_NIGHT_STORAGE_DEFAULT_KEY,
+                enableNightMode.toString(),
+            );
 
             if (pseudoMobile) {
                 Object.defineProperty(window.navigator, `userAgent`, {
@@ -146,6 +155,10 @@ export function tuiVisit(path: string, options: TuiVisitOptions = {}): void {
     }
 
     cy.get(`${rootSelector}._is-cypress-mode`).as(`app`);
+
+    if (stopAnimation) {
+        cy.get(`@app`).invoke(`addClass`, `_stop-animation`);
+    }
 
     if (hideCursor) {
         cy.get(`@app`).invoke(`addClass`, `_hide-cursor`);

@@ -65,14 +65,14 @@ export class TuiRadioLabeledComponent<T>
         @Self()
         @Inject(NgControl)
         control: NgControl | null,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
         @Optional()
         @Inject(TuiModeDirective)
         private readonly modeDirective: TuiModeDirective | null,
         @Inject(TUI_RADIO_OPTIONS)
         private readonly options: TuiRadioOptions,
     ) {
-        super(control, changeDetectorRef);
+        super(control, cdr);
     }
 
     get nativeFocusableElement(): TuiNativeFocusableElement | null {
@@ -97,7 +97,8 @@ export class TuiRadioLabeledComponent<T>
         this.updateFocused(focused);
     }
 
+    /** @deprecated use 'value' setter */
     onModelChange(value: T): void {
-        this.updateValue(value);
+        this.value = value;
     }
 }

@@ -2,6 +2,12 @@ import {Component} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {changeDetection} from '@demo/emulate/change-detection';
 import {encapsulation} from '@demo/emulate/encapsulation';
+import {TuiBooleanHandler, TuiStringHandler} from '@taiga-ui/cdk';
+
+interface Item {
+    name: string;
+    id: number;
+}
 
 @Component({
     selector: 'tui-select-example-11',
@@ -10,8 +16,9 @@ import {encapsulation} from '@demo/emulate/encapsulation';
     encapsulation,
 })
 export class TuiSelectExample11 {
-    itemControl = new FormControl();
+    itemStringControl = new FormControl();
     itemGroupControl = new FormControl();
+    itemControl = new FormControl();
 
     items = [
         'Luke Skywalker',
@@ -27,5 +34,18 @@ export class TuiSelectExample11 {
         ['Broccoli Cheddar', 'Chicken and Rice', 'Chicken Noodle'],
     ];
 
+    customItems: readonly Item[] = [
+        {name: 'Luke Skywalker', id: 1},
+        {name: 'Leia Organa Solo', id: 2},
+        {name: 'Darth Vader', id: 3},
+        {name: 'Han Solo', id: 4},
+        {name: 'Obi-Wan Kenobi', id: 5},
+        {name: 'Yoda', id: 6},
+    ];
+
     labels = ['Salad', 'Soup'];
+
+    stringify: TuiStringHandler<Item> = item => item.name;
+
+    disabledItemHandler: TuiBooleanHandler<string> = item => item.startsWith('Chicken');
 }

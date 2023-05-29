@@ -77,7 +77,7 @@ export class TuiToolbarComponent {
 
     readonly TuiEditorTool: typeof TuiEditorTool = TuiEditorTool;
 
-    toolsSet: Set<TuiEditorTool> = new Set(defaultEditorTools);
+    toolsSet = new Set<TuiEditorTool>(defaultEditorTools);
 
     @Input()
     @tuiDefaultProp(toolsAssertion, 'Attach and TeX are not yet implemented in Editor')
@@ -88,7 +88,7 @@ export class TuiToolbarComponent {
     constructor(
         @Optional()
         @Inject(ElementRef)
-        private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly el: ElementRef<HTMLElement>,
         @Inject(TuiTiptapEditorService) readonly editor: AbstractTuiEditor,
         @Inject(TUI_IMAGE_LOADER)
         private readonly imageLoader: TuiHandler<File, Observable<string>>,
@@ -107,7 +107,7 @@ export class TuiToolbarComponent {
 
     get focused(): boolean {
         return (
-            tuiIsNativeFocusedIn(this.elementRef.nativeElement) ||
+            tuiIsNativeFocusedIn(this.el.nativeElement) ||
             !!this.dropdowns.find(({nativeElement}) =>
                 tuiIsNativeFocusedIn(nativeElement),
             )
@@ -231,7 +231,11 @@ export class TuiToolbarComponent {
             return;
         }
 
-        tuiAssert.assert(!!this.filesLoader, 'Please provide TUI_ATTACH_FILES_LOADER');
+        ngDevMode &&
+            tuiAssert.assert(
+                !!this.filesLoader,
+                'Please provide TUI_ATTACH_FILES_LOADER',
+            );
 
         this.filesLoader?.(files)
             .pipe(take(1))

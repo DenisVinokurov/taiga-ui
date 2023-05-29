@@ -1,15 +1,23 @@
 {
+    "name": "styles",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "root": "projects/styles",
     "sourceRoot": "projects/styles",
     "projectType": "library",
     "prefix": "tui",
     "implicitDependencies": ["!testing"],
-    "architect": {
+    "targets": {
+        "lint": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "eslint --no-error-on-unmatched-pattern \"**/projects/styles/**/*\""
+            }
+        },
         "build": {
             "executor": "nx:run-commands",
             "outputs": ["dist/styles"],
             "options": {
-                "command": "npx cpy . '!project.json'  '../../dist/styles' --cwd=projects/styles"
+                "command": "npx cpy . \"!project.json\"  \"../../dist/styles\" --cwd=projects/styles"
             }
         },
         "publish": {

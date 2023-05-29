@@ -7,6 +7,7 @@ import {
 } from '@angular/common';
 import {inject, PLATFORM_ID, Provider} from '@angular/core';
 import {Title} from '@angular/platform-browser';
+import {UrlTree} from '@angular/router';
 import {
     TUI_DOC_CODE_EDITOR,
     TUI_DOC_DEFAULT_TABS,
@@ -17,14 +18,23 @@ import {
     TUI_DOC_SEE_ALSO,
     TUI_DOC_SOURCE_CODE,
     TUI_DOC_TITLE,
+    TUI_DOC_URL_STATE_HANDLER,
     TuiDocSourceCodePathOptions,
 } from '@taiga-ui/addon-doc';
 import {
     TUI_DIALOG_CLOSES_ON_BACK,
+    TUI_ENSURE_BASE_HREF,
     TUI_IS_CYPRESS,
     TUI_TAKE_ONLY_TRUSTED_EVENTS,
 } from '@taiga-ui/cdk';
-import {TUI_ANIMATIONS_DURATION, TUI_SANITIZER} from '@taiga-ui/core';
+import {
+    TUI_ANIMATIONS_DURATION,
+    TUI_DROPDOWN_HOVER_DEFAULT_OPTIONS,
+    TUI_DROPDOWN_HOVER_OPTIONS,
+    TUI_HINT_DEFAULT_OPTIONS,
+    TUI_HINT_OPTIONS,
+    TUI_SANITIZER,
+} from '@taiga-ui/core';
 import {TuiLanguageName, tuiLanguageSwitcher} from '@taiga-ui/i18n';
 import {NgDompurifySanitizer} from '@tinkoff/ng-dompurify';
 import {HIGHLIGHT_OPTIONS} from 'ngx-highlightjs';
@@ -124,6 +134,20 @@ export const APP_PROVIDERS: Provider[] = [
         useFactory: () => (inject(TUI_IS_CYPRESS) ? 0 : 300),
     },
     {
+        provide: TUI_HINT_OPTIONS,
+        useFactory: () =>
+            inject(TUI_IS_CYPRESS)
+                ? {...TUI_HINT_DEFAULT_OPTIONS, showDelay: 0, hideDelay: 0}
+                : TUI_HINT_DEFAULT_OPTIONS,
+    },
+    {
+        provide: TUI_DROPDOWN_HOVER_OPTIONS,
+        useFactory: () =>
+            inject(TUI_IS_CYPRESS)
+                ? {...TUI_DROPDOWN_HOVER_DEFAULT_OPTIONS, showDelay: 0, hideDelay: 0}
+                : TUI_DROPDOWN_HOVER_DEFAULT_OPTIONS,
+    },
+    {
         provide: TUI_DOC_SCROLL_BEHAVIOR,
         useFactory: () => (inject(TUI_IS_CYPRESS) ? `auto` : `smooth`), // https://github.com/cypress-io/cypress/issues/4640
     },
@@ -136,6 +160,12 @@ export const APP_PROVIDERS: Provider[] = [
         // TODO: change it back after solving https://github.com/Tinkoff/taiga-ui/issues/3270
         // useFactory: () => of(!tuiIsInsideIframe(inject(WINDOW))), // for cypress tests
         useFactory: () => of(inject(TUI_IS_CYPRESS)),
+    },
+    {
+        provide: TUI_DOC_URL_STATE_HANDLER,
+        deps: [TUI_ENSURE_BASE_HREF],
+        useFactory: (baseHref: string) => (tree: UrlTree) =>
+            String(tree).replace(baseHref, ``),
     },
     tuiLanguageSwitcher(
         async (language: TuiLanguageName): Promise<unknown> =>

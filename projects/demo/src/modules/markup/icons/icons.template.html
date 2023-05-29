@@ -1,13 +1,21 @@
-<tui-doc-page
-    i18n-header
-    header="Icons"
->
+<tui-doc-page header="Icons">
     <ng-template
         *ngFor="let key of keys"
-        i18n-pageTab
         [pageTab]="key"
     >
-        <p i18n>
+        <tui-notification>
+            Open source theme for Taiga UI uses processed
+            <a
+                tuiLink
+                target="_blank"
+                rel="noreferrer"
+                href="https://feathericons.com/"
+            >
+                Feather Icons
+            </a>
+            as its icon pack with some custom made icons.
+        </tui-notification>
+        <p>
             These icons can be used by name in
             <a
                 tuiLink
@@ -27,6 +35,24 @@
         </p>
 
         <icons-group [icons]="icons[key]">
+            <div class="icons-customization">
+                <tui-checkbox-labeled
+                    size="m"
+                    class="t-checkbox"
+                    [(ngModel)]="background"
+                >
+                    Background
+                </tui-checkbox-labeled>
+
+                <tui-checkbox-labeled
+                    size="m"
+                    class="t-checkbox tui-space_right-3"
+                    [(ngModel)]="appearance"
+                >
+                    Icon appearance
+                </tui-checkbox-labeled>
+            </div>
+
             <ng-template
                 iconGroup
                 let-icon="icon"
@@ -36,11 +62,13 @@
                     tuiIconButton
                     type="button"
                     size="m"
-                    i18n-title
                     title="Copy"
                     appearance="icon"
                     class="icon"
                     [attr.aria-label]="icon"
+                    [class.t-appearance]="appearance"
+                    [class.t-background]="background"
+                    [class.t-wrapper-icons_dark]="(mode$ | async) === 'onDark'"
                     [icon]="icon"
                     (click)="copyPath(icon)"
                 ></button>
@@ -51,7 +79,6 @@
     <ng-template pageTab="SVG Tips">
         <tui-doc-example
             id="base"
-            i18n-heading
             heading="Customization"
             description="You can customize the path to your icons and inherit color"
             [content]="example1"
@@ -61,7 +88,6 @@
 
         <tui-doc-example
             id="inline"
-            i18n-heading
             heading="Inline SVG"
             description="If you use unsafe icons or inline SVG with linear gradient you need to provide TUI_SANITIZER"
             [content]="example2"

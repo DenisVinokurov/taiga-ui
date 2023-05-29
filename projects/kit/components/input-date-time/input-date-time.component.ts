@@ -12,18 +12,20 @@ import {
 import {NgControl} from '@angular/forms';
 import {
     AbstractTuiControl,
+    AbstractTuiValueTransformer,
     ALWAYS_FALSE_HANDLER,
     changeDateSeparator,
     DATE_FILLER_LENGTH,
     TUI_DATE_FORMAT,
     TUI_DATE_SEPARATOR,
+    TUI_IS_IOS,
+    TUI_IS_MOBILE,
     TuiActiveZoneDirective,
     tuiAsControl,
     tuiAsFocusableItemAccessor,
     TuiBooleanHandler,
     tuiClamp,
     TuiContextWithImplicit,
-    TuiControlValueTransformer,
     tuiDateClamp,
     TuiDateMode,
     TuiDay,
@@ -121,7 +123,7 @@ export class TuiInputDateTimeComponent
         @Self()
         @Inject(NgControl)
         control: NgControl | null,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
         @Inject(TUI_TEXTFIELD_SIZE)
         private readonly textfieldSize: TuiTextfieldSizeDirective,
         @Inject(TUI_DATE_FORMAT) readonly dateFormat: TuiDateMode,
@@ -132,13 +134,15 @@ export class TuiInputDateTimeComponent
         readonly dateTexts$: Observable<Record<TuiDateMode, string>>,
         @Optional()
         @Inject(TUI_DATE_TIME_VALUE_TRANSFORMER)
-        override readonly valueTransformer: TuiControlValueTransformer<
+        override readonly valueTransformer: AbstractTuiValueTransformer<
             [TuiDay | null, TuiTime | null]
         > | null,
         @Inject(TUI_INPUT_DATE_OPTIONS)
         private readonly options: TuiInputDateOptions,
+        @Inject(TUI_IS_MOBILE) readonly isMobile: boolean,
+        @Inject(TUI_IS_IOS) readonly isIos: boolean,
     ) {
-        super(control, changeDetectorRef, valueTransformer);
+        super(control, cdr, valueTransformer);
     }
 
     get fillerLength(): number {
@@ -166,6 +170,14 @@ export class TuiInputDateTimeComponent
 
     get calendarIcon(): TuiInputDateOptions['icon'] {
         return this.options.icon;
+    }
+
+    private get nativePicker(): boolean {
+        return !!this.options.nativePicker && this.isMobile;
+    }
+
+    get showNativePicker(): boolean {
+        return this.nativePicker && this.timeMode === 'HH:MM';
     }
 
     get computedValue(): string {
@@ -231,13 +243,12 @@ export class TuiInputDateTimeComponent
         }
 
         if (value.length < DATE_FILLER_LENGTH) {
-            this.updateValue([null, null]);
+            this.value = [null, null];
 
             return;
         }
 
         const [date, time] = value.split(DATE_TIME_SEPARATOR);
-
         const parsedDate = TuiDay.normalizeParse(date, this.dateFormat);
         const parsedTime =
             time && time.length === this.timeMode.length
@@ -245,13 +256,13 @@ export class TuiInputDateTimeComponent
                 : null;
 
         this.open = false;
-        this.updateValue([parsedDate, parsedTime]);
+        this.value = [parsedDate, parsedTime];
     }
 
     onDayClick(day: TuiDay): void {
         const modifiedTime = this.value[1] && this.clampTime(this.value[1], day);
 
-        this.updateValue([day, modifiedTime]);
+        this.value = [day, modifiedTime];
         this.updateNativeValue(day);
         this.open = false;
     }
@@ -285,7 +296,7 @@ export class TuiInputDateTimeComponent
 
         const parsedTime = TuiTime.fromString(time);
 
-        this.updateValue([this.value[0], parsedTime]);
+        this.value = [this.value[0], parsedTime];
 
         setTimeout(() => {
             if (this.nativeValue.endsWith('.') || this.nativeValue.endsWith(':')) {
@@ -302,7 +313,8 @@ export class TuiInputDateTimeComponent
     override writeValue(value: [TuiDay | null, TuiTime | null] | null): void {
         super.writeValue(value);
 
-        this.nativeValue = value && (value[0] || value[1]) ? this.computedValue : '';
+        this.nativeValue =
+            this.value && (this.value[0] || this.value[1]) ? this.computedValue : '';
     }
 
     protected getFallbackValue(): [TuiDay | null, TuiTime | null] {

@@ -53,8 +53,7 @@ export class TuiInputCopyComponent
     private readonly copy$ = new Subject<void>();
 
     @Input()
-    @tuiDefaultProp()
-    successMessage: PolymorpheusContent = '';
+    successMessage: PolymorpheusContent;
 
     @Input()
     @tuiDefaultProp()
@@ -69,13 +68,13 @@ export class TuiInputCopyComponent
         @Self()
         @Inject(NgControl)
         control: NgControl | null,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
-        @Inject(DOCUMENT) private readonly documentRef: Document,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
+        @Inject(DOCUMENT) private readonly doc: Document,
         @Inject(TUI_TEXTFIELD_SIZE)
         private readonly textfieldSize: TuiTextfieldSizeDirective,
         @Inject(TUI_COPY_TEXTS) private readonly copyTexts$: Observable<[string, string]>,
     ) {
-        super(control, changeDetectorRef);
+        super(control, cdr);
     }
 
     @HostBinding('class._has-value')
@@ -115,7 +114,7 @@ export class TuiInputCopyComponent
     }
 
     onValueChange(value: string): void {
-        this.updateValue(value);
+        this.value = value;
     }
 
     onFocused(focused: boolean): void {
@@ -128,7 +127,7 @@ export class TuiInputCopyComponent
         }
 
         this.textfield.nativeFocusableElement.select();
-        this.documentRef.execCommand('copy');
+        this.doc.execCommand('copy');
         this.copy$.next();
     }
 

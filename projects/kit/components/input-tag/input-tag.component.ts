@@ -42,7 +42,6 @@ import {
     MODE_PROVIDER,
     TEXTFIELD_CONTROLLER_PROVIDER,
     TUI_MODE,
-    TUI_TEXTFIELD_APPEARANCE,
     TUI_TEXTFIELD_WATCHED_CONTROLLER,
     tuiAsDataListHost,
     TuiBrightness,
@@ -131,7 +130,9 @@ export class TuiInputTagComponent
 
     @Input()
     @tuiDefaultProp()
-    tagValidator: TuiBooleanHandler<string> = ALWAYS_TRUE_HANDLER;
+    tagValidator:
+        | TuiBooleanHandler<string>
+        | TuiBooleanHandler<TuiStringifiableItem<unknown> | string> = ALWAYS_TRUE_HANDLER;
 
     // TODO: 4.0 Consider removing and use rows = 1 instead
     @Input()
@@ -157,6 +158,10 @@ export class TuiInputTagComponent
     @Input()
     @tuiDefaultProp()
     placeholder = '';
+
+    @Input()
+    @tuiDefaultProp()
+    removable = true;
 
     @Input()
     @tuiDefaultProp()
@@ -195,10 +200,9 @@ export class TuiInputTagComponent
         @Self()
         @Inject(NgControl)
         control: NgControl | null,
-        @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(ChangeDetectorRef) cdr: ChangeDetectorRef,
         @Inject(TuiScrollService) private readonly tuiScrollService: TuiScrollService,
-        @Inject(ElementRef) private readonly elementRef: ElementRef<HTMLElement>,
-        @Inject(TUI_TEXTFIELD_APPEARANCE) readonly appearance: string,
+        @Inject(ElementRef) private readonly el: ElementRef<HTMLElement>,
         @Optional()
         @Inject(TuiModeDirective)
         private readonly modeDirective: TuiModeDirective | null,
@@ -215,7 +219,7 @@ export class TuiInputTagComponent
         @Inject(TuiHostedDropdownComponent)
         private readonly parentHostedDropdown?: TuiHostedDropdownComponent,
     ) {
-        super(control, changeDetectorRef);
+        super(control, cdr);
     }
 
     get nativeFocusableElement(): HTMLInputElement | null {
@@ -226,9 +230,12 @@ export class TuiInputTagComponent
 
     get focused(): boolean {
         return (
-            tuiIsNativeFocusedIn(this.elementRef.nativeElement) ||
-            !!this.hostedDropdown?.focused
+            tuiIsNativeFocusedIn(this.el.nativeElement) || !!this.hostedDropdown?.focused
         );
+    }
+
+    get appearance(): string {
+        return this.controller.appearance;
     }
 
     @HostBinding('attr.data-size')
@@ -295,6 +302,13 @@ export class TuiInputTagComponent
             this.hasCleaner ||
             !!this.icon ||
             (!!this.hintOptions?.content && !this.computedDisabled)
+        );
+    }
+
+    get showHint(): boolean {
+        return (
+            !!this.hintOptions?.content &&
+            (this.controller.options.hintOnDisabled || !this.computedDisabled)
         );
     }
 
@@ -390,7 +404,7 @@ export class TuiInputTagComponent
 
     onTagEdited(value: string, index: number): void {
         this.focusInput();
-        this.updateValue(
+        this.value = this.filterValue(
             this.value
                 .map((tag, tagIndex) =>
                     tagIndex !== index
@@ -410,7 +424,7 @@ export class TuiInputTagComponent
     handleOption(item: string): void {
         this.focusInput();
         this.updateSearch('');
-        this.updateValue(this.value.concat(item));
+        this.value = this.filterValue(this.value.concat(item));
         this.open = false;
         this.scrollToEnd$.next();
     }
@@ -424,7 +438,7 @@ export class TuiInputTagComponent
 
         if (array.length > 1) {
             this.updateSearch(this.clippedValue(array[array.length - 1].trim()));
-            this.updateValue([...this.value, ...validated]);
+            this.value = this.filterValue([...this.value, ...validated]);
         } else {
             this.updateSearch(this.clippedValue(value));
         }
@@ -454,18 +468,15 @@ export class TuiInputTagComponent
         return tag.toString();
     }
 
-    protected override updateValue(value: string[]): void {
+    private filterValue(value: string[]): string[] {
         const seen = new Set();
 
-        super.updateValue(
-            value
-                .reverse()
-                .filter(
-                    item =>
-                        !this.uniqueTags || (!!item && !seen.has(item) && seen.add(item)),
-                )
-                .reverse(),
-        );
+        return value
+            .reverse()
+            .filter(
+                item => !this.uniqueTags || (item && !seen.has(item) && seen.add(item)),
+            )
+            .reverse();
     }
 
     private onScrollKeyDown(currentIndex: number, flag: number): void {
@@ -540,13 +551,13 @@ export class TuiInputTagComponent
         }
 
         this.updateSearch('');
-        this.updateValue(this.value.concat(inputValue));
+        this.value = this.filterValue(this.value.concat(inputValue));
     }
 
     private deleteLastEnabledItem(): void {
         for (let index = this.value.length - 1; index >= 0; index--) {
             if (!this.disabledItemHandler(this.value[index])) {
-                this.updateValue(tuiArrayRemove(this.value, index));
+                this.value = tuiArrayRemove(this.value, index);
 
                 break;
             }

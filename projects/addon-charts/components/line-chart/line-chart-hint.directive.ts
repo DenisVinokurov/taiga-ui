@@ -1,5 +1,5 @@
 import {
-    AfterContentInit,
+    AfterViewInit,
     ContentChildren,
     Directive,
     ElementRef,
@@ -15,7 +15,6 @@ import {TuiLineChartHintContext} from '@taiga-ui/addon-charts/interfaces';
 import {
     EMPTY_QUERY,
     TuiContextWithImplicit,
-    tuiDefaultProp,
     TuiDestroyService,
     TuiHoveredService,
     tuiPure,
@@ -42,7 +41,7 @@ import {TuiLineChartComponent} from './line-chart.component';
     selector: '[tuiLineChartHint]',
     providers: [TuiDestroyService, TuiHoveredService],
 })
-export class TuiLineChartHintDirective implements AfterContentInit {
+export class TuiLineChartHintDirective implements AfterViewInit {
     @ContentChildren(forwardRef(() => TuiLineChartComponent))
     private readonly charts: QueryList<TuiLineChartComponent> = EMPTY_QUERY;
 
@@ -50,8 +49,7 @@ export class TuiLineChartHintDirective implements AfterContentInit {
     private readonly chartsRef: QueryList<ElementRef<HTMLElement>> = EMPTY_QUERY;
 
     @Input('tuiLineChartHint')
-    @tuiDefaultProp()
-    hint: PolymorpheusContent<TuiContextWithImplicit<readonly TuiPoint[]>> = '';
+    hint: PolymorpheusContent<TuiContextWithImplicit<readonly TuiPoint[]>>;
 
     constructor(
         @Inject(Renderer2) private readonly renderer: Renderer2,
@@ -60,7 +58,7 @@ export class TuiLineChartHintDirective implements AfterContentInit {
         @Inject(TuiHoveredService) private readonly hovered$: Observable<boolean>,
     ) {}
 
-    ngAfterContentInit(): void {
+    ngAfterViewInit(): void {
         combineLatest([tuiLineChartDrivers(this.charts), this.hovered$])
             .pipe(
                 filter(result => !result.some(Boolean)),

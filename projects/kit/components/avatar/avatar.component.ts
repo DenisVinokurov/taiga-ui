@@ -6,8 +6,14 @@ import {
     Input,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {tuiDefaultProp, tuiIsString, tuiRequiredSetter} from '@taiga-ui/cdk';
-import {tuiSizeBigger} from '@taiga-ui/core';
+import {
+    tuiDefaultProp,
+    tuiIsString,
+    tuiPure,
+    tuiRequiredSetter,
+    TuiSafeHtml,
+} from '@taiga-ui/cdk';
+import {tuiSizeBigger, TuiSizeXXL, TuiSizeXXS} from '@taiga-ui/core';
 import {tuiStringHashToHsl} from '@taiga-ui/kit/utils/format';
 
 import {TUI_AVATAR_OPTIONS, TuiAvatarOptions} from './avatar-options';
@@ -34,6 +40,10 @@ export class TuiAvatarComponent {
     @Input()
     @tuiDefaultProp()
     text = '';
+
+    @Input()
+    @tuiDefaultProp()
+    fallback: TuiSafeHtml | null = null;
 
     @Input()
     @tuiDefaultProp()
@@ -64,16 +74,16 @@ export class TuiAvatarComponent {
         return tuiIsString(this.avatarUrl) && !!this.avatarUrl?.startsWith('tuiIcon');
     }
 
+    get useFallback(): boolean {
+        return (
+            !!this.fallback && !!this.avatarUrl && !this.isUrlValid && !this.text.length
+        );
+    }
+
     get computedText(): string {
-        if (this.hasAvatar || this.iconAvatar || this.text === '') {
-            return '';
-        }
-
-        const words = this.text.split(' ');
-
-        return words.length > 1 && tuiSizeBigger(this.size)
-            ? words[0].slice(0, 1) + words[1].slice(0, 1)
-            : words[0].slice(0, 1);
+        return this.hasAvatar || this.iconAvatar || this.text === ''
+            ? ''
+            : this.getSlicedText(this.text, this.size);
     }
 
     get stringAvatar(): string {
@@ -82,5 +92,14 @@ export class TuiAvatarComponent {
 
     onError(): void {
         this.isUrlValid = false;
+    }
+
+    @tuiPure
+    private getSlicedText(text: string, size: TuiSizeXXL | TuiSizeXXS): string {
+        const words = text.split(' ');
+
+        return words.length > 1 && tuiSizeBigger(size)
+            ? words[0].slice(0, 1) + words[1].slice(0, 1)
+            : words[0].slice(0, 1);
     }
 }

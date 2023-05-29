@@ -1,3 +1,4 @@
+import {tuiClickOutside} from '@demo-integrations/support/helpers/click-outside';
 import {
     tuiFindDocExample,
     tuiGetDocExample,
@@ -21,9 +22,9 @@ import {tuiBeInViewportAssertion, tuiWaitAllImgInside} from '@taiga-ui/testing/c
 declare global {
     namespace Cypress {
         interface Chainable {
-            getByAutomationId(automationId: string): Chainable<JQuery<HTMLElement>>;
+            getByAutomationId(automationId: string): Chainable<JQuery>;
 
-            findByAutomationId(automationId: string): Chainable<JQuery<HTMLElement>>;
+            findByAutomationId(automationId: string): Chainable<JQuery>;
 
             tuiVisit: typeof tuiVisit;
             tuiHide: typeof tuiHide;
@@ -32,18 +33,15 @@ declare global {
             tuiSetLanguage: typeof tuiSetLanguage;
             tuiSetNightMode: typeof tuiSetNightMode;
             tuiWaitCodeHighlight: typeof tuiWaitCodeHighlight;
-            tuiWaitBeforeScreenshot: typeof tuiWaitBeforeScreenshot;
-            tuiWaitBeforeAction: typeof tuiWaitBeforeAction;
+            tuiClickOutside: typeof tuiClickOutside;
 
             tuiTab(direction: 'backward' | 'forward'): Chainable;
-
             tuiGetByExampleId(): Chainable;
             tuiFindByExampleId(): Chainable;
-
+            tuiWaitBeforeAction(): Chainable;
+            tuiWaitBeforeScreenshot(): Chainable;
             tuiScrollIntoView(): Chainable;
-
             tuiFocus(): Chainable;
-
             tuiWaitAllImgInside(enabled?: boolean): Chainable;
         }
 
@@ -78,6 +76,7 @@ Cypress.Commands.add(`tuiShow`, tuiShow);
 Cypress.Commands.add(`tuiFindByExampleId`, {prevSubject: true}, <S>(subject: S) =>
     tuiFindDocExample<S>(subject),
 );
+Cypress.Commands.add(`tuiClickOutside`, tuiClickOutside);
 Cypress.Commands.add(
     `tuiWaitBeforeScreenshot`,
     {prevSubject: [`optional`]},
